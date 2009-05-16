@@ -1,0 +1,363 @@
+#! /bin/bash
+
+# **************************************************************************
+# (C)Copyright 2006, The Open Hurderos Foundation. All rights reserved.
+#
+# This utility implements generating source templates for a Hurdlib
+# programing object.
+# **************************************************************************
+
+
+#
+# Variable declarations.
+#
+declare -r Pgm=`basename $0`;
+
+declare -r Version="1.0";
+
+declare Mode="unknown";
+
+declare Filename="";
+
+declare Library="";
+declare LibraryOID="";
+
+declare Object="";
+declare ObjectOID="";
+
+
+#
+# This function is responsible for converting the various template
+# identifiers into their equivalent values.
+#
+
+function filter() {
+
+	sed -e "s/{OBJECT}/$Object/g" -e "s/{LIBRARY}/$Library/g";
+	return;
+}
+
+
+#
+# This function is responsible for generating a copyright message.
+#
+
+function copyright() {
+
+	local date=`date +%Y`;
+    
+cat - <<EOF_COPYRIGHT
+/** \file
+ *
+ */
+
+/**************************************************************************
+ * (C)Copyright $date, The Open Hurderos Foundation. All rights reserved.
+ *
+ * Please refer to the file named COPYING in the top of the source tree
+ * for licensing information.
+ **************************************************************************/
+EOF_COPYRIGHT
+
+	return;
+}
+
+
+#
+# Print the program header.
+#
+function Header() {
+
+	echo "$Pgm: Hurdlib Template Generator - $Version";
+	return;
+}
+
+
+#
+# This function is responsible for display usage information for the
+# the program.
+#
+
+function Usage() {
+
+	Header;
+
+	cat - <<EOF_Usage
+
+	Usage: $Pgm [mode switches] [option switches]
+
+	Mode switches:
+		-C:	Generate copyright header.
+		-F:	Create header and source files.
+		-H:	Display usage information.
+		-I:	Generate header file.
+		-S:	Generate source file.
+
+	Option switches:
+		-f:	Base filename.
+		-i:	Numeric object identifier.
+		-l:	Library name.
+		-n:	Library object identifier.
+		-o:	Object name.
+
+EOF_Usage
+
+	return;
+}
+
+
+#
+# This function generates a header file template for a Hurdlib object.
+#
+function Generate_Header() {
+
+	copyright;
+
+cat - <<EOF
+
+#ifndef {LIBRARY}_{OBJECT}_HEADER
+#define {LIBRARY}_{OBJECT}_HEADER
+
+
+/* Object type definitions. */
+typedef struct {LIBRARY}_{OBJECT} * {OBJECT};
+
+typedef struct {LIBRARY}_{OBJECT}_State * {OBJECT}_State;
+
+/**
+ * External {OBJECT} object representation.
+ */
+struct {LIBRARY}_{OBJECT}
+{
+	/* External methods. */
+	void (*whack)(const {OBJECT});
+
+	/* Private state. */
+	{OBJECT}_State state;
+};
+
+
+/* {OBJECT} constructor call. */
+extern {OBJECT} {LIBRARY}_{OBJECT}_Init(void);
+
+#endif
+EOF
+}
+
+
+#
+# This function generates a source template for a specified object.
+#
+function Generate_Source() {
+
+	copyright;
+
+cat - <<EOF
+
+/* Include files. */
+#include <stdint.h>
+
+#include "{LIBRARY}.h"
+#include "{OBJECT}.h"
+
+
+/* Verify library/object header file inclusions. */
+#if !defined({LIBRARY}_LIBID)
+#error Library identifier not defined.
+#endif
+
+#if !defined({LIBRARY}_{OBJECT}_OBJID)
+#error Object identifier not defined.
+#endif
+
+
+/** {OBJECT} private state information. */
+struct {LIBRARY}_{OBJECT}_State
+{
+	/* The root object. */
+	Origin root;
+
+	/* Library identifier. */
+	uint32_t libid;
+
+	/* Object identifier. */
+	uint32_t objid;
+
+};
+
+
+/**
+ * Internal private method.
+ *
+ * This method is responsible for initializing the {LIBRARY}_{OBJECT}_State
+ * structure which holds state information for each instantiated object.
+ *
+ * \param S A pointer to the object containing the state information which
+ *        is to be initialized.
+ */
+
+static void _init_state(const {OBJECT}_State const S) {
+
+	S->libid = {LIBRARY}_LIBID;
+	S->objid = {LIBRARY}_{OBJECT}_OBJID;
+
+	return;
+}
+
+
+/**
+ * External public method.
+ *
+ * This method implements a destructor for a {OBJECT} object.
+ *
+ * \param this	A pointer to the object which is to be destroyed.
+ */
+
+static void whack(const {OBJECT} const this)
+
+{
+	auto const {OBJECT}_State const S = this->state;
+
+
+	S->root->whack(S->root, this, S);
+	return;
+}
+
+	
+/**
+ * External constructor call.
+ *
+ * This function implements a constructor call for a {OBJECT} object.
+ *
+ * \return	A pointer to the initialized {OBJECT}.  A null value
+ *		indicates an error was encountered in object generation.
+ */
+
+extern {OBJECT} {LIBRARY}_{OBJECT}_Init(void)
+
+{
+	auto Origin root;
+
+	auto {OBJECT} this = NULL;
+
+	auto struct HurdLib_Origin_Retn retn;
+
+
+	/* Get the root object. */
+	root = HurdLib_Origin_Init();
+
+	/* Allocate the object and internal state. */
+	retn.object_size  = sizeof(struct {LIBRARY}_{OBJECT});
+	retn.state_size   = sizeof(struct {LIBRARY}_{OBJECT}_State);
+	if ( !root->init(root, {LIBRARY}_LIBID, {LIBRARY}_{OBJECT}_OBJID, &retn) )
+		return NULL;
+	this	    	  = retn.object;
+	this->state 	  = retn.state;
+	this->state->root = root;
+
+	/* Initialize aggregate objects. */
+
+	/* Initialize object state. */
+	_init_state(this->state);
+
+	/* Method initialization. */
+	this->whack = whack;
+
+	return this;
+}
+EOF
+}
+
+
+###########################################################################
+# Main program starts here.
+
+while getopts "CFHISf:i:l:n:o:" arg;
+do
+        case $arg in
+		C)	Mode="copyright";;
+		F)	Mode="file";;
+		H)	Mode="help";;
+                I)      Mode="header";;
+	        S)	Mode="source";;
+
+		f)	Filename=$OPTARG;;
+		i)	ObjectOID=$OPTARG;;
+	    	l)	Library=$OPTARG;;
+		n)	LibraryOID=$OPTARG;;
+		o)	Object=$OPTARG;;
+	esac;
+done;
+
+
+#
+# Trap an unknown mode.
+#
+if [ "$Mode" = "unknown" ]; then
+	echo "$Pgm: Use -H for help.";
+	exit 0;
+fi;
+
+
+#
+# Display help information if requested.
+#
+if [ "$Mode" = "help" ]; then
+	Usage;
+	exit 0;
+fi;
+
+
+#
+# Display copyright information if requested.
+#
+if [ "$Mode" = "copyright" ]; then
+	copyright;
+	exit 0;
+fi;
+
+
+#
+# Sanity checks.
+#
+if [ -z "$Object" ]; then
+	echo "$Pgm: No object name specified.";
+	exit 1;
+fi;
+
+if [ -z "$ObjectOID" ]; then
+	echo "$Pgm: No numeric object identifier specified.";
+	exit 1;
+fi;
+
+if [ -z "$Library" ]; then
+	echo "$Pgm: No library name specified.";
+	exit 1;
+fi;
+
+if [ -z "$LibraryOID" ]; then
+	echo "$Pgm: No library OID specified.";
+	exit 1;
+fi;
+
+if [ "$Mode" = "file" -a -z "$Filename" ]; then
+	echo "$Pgm: No base output filename specified.";
+	exit 1;
+fi;
+
+
+#
+# Implement program modes.
+#
+
+case $Mode in
+	file)	Generate_Header | filter >$Filename.h;
+		Generate_Source | filter >$Filename.c;;
+
+	header)	Generate_Header | filter;;
+
+	source)	Generate_Source | filter;;
+esac;
+
+
+exit 0;
