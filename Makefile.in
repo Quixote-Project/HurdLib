@@ -1,34 +1,30 @@
+# @configure_input@
 # ***************************************************************************
-# (C)Copyright 2003, The Open Hurderos Foundation. All rights reserved.
+# (C)Copyright 2003-2009, The Open Hurderos Foundation. All rights reserved.
 # ***************************************************************************
 
 
-# Variable declarations.
+# Variable declarations provided by autoconf/configure.
+prefix = @prefix@
+exec_prefix = @exec_prefix@
+CC = @CC@
+LDFLAGS = @LDFLAGS@
+
+
+# Variables local to this Makefile
+CFLAGS = @CFLAGS@ @CPPFLAGS@ -Wall
+
 CSRC =	Buffer.c Fibsequence.c Origin.c String.c Config.c basic-parser.c
 
 LIBNAME = HurdLib
 LIBRARY = lib${LIBNAME}.a
 
-CC = gcc
 
 # Uncomment the following two lines to enable compilation with memory debug
 # support
 #
 # DMALLOC = -DDMALLOC
 # DMALLOC_LIBS = -ldmalloc
-
-#
-# Locations of SSL include files and libraries
-#
-SSL_INCLUDE = /usr/local/ssl/include
-SSL_LIBRARY = -L /usr/local/ssl/lib -l ssl
-
-CDEBUG = -O2 -fomit-frame-pointer -march=pentium2 ${DMALLOC}
-CDEBUG = -g ${DMALLOC}
-
-CFLAGS = -Wall ${CDEBUG} -I../include # -pedantic-errors -ansi
-
-LDFLAGS = -g ${DMALLOC_LIBS}
 
 
 #
@@ -39,7 +35,7 @@ LDFLAGS = -g ${DMALLOC_LIBS}
 
 
 #
-# Automatic definition of classes and objects.
+# Automatic variable definitions.
 #
 COBJS = ${CSRC:.c=.o}
 
@@ -55,10 +51,13 @@ basic-parser.c: basic-parser.l
 	flex -o$@ $?;
 
 tags:
-	/opt/emacs/bin/etags *.{h,c};
+	etags *.{h,c};
 
 clean:
-	/bin/rm -f *.o *~ basic-parser.c TAGS ${LIBRARY}
+	/bin/rm -f basic-parser.c ${COBJS} *~ TAGS ${LIBRARY};
+
+distclean: clean
+	/bin/rm -f config.log config.status Makefile autom4te.cache;
 
 
 # Source dependencies.
