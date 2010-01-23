@@ -36,6 +36,7 @@ struct HurdLib_Buffer
 	void (*reset)(const Buffer);
 	void (*print)(const Buffer);
 	void (*dump)(const Buffer, int);
+	_Bool (*poisoned)(const Buffer);
 	void (*whack)(const Buffer);
 
 	/* Private state. */

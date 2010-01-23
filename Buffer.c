@@ -46,6 +46,9 @@ struct HurdLib_Buffer_State
 	/* Object identifier. */
 	uint32_t objid;
 
+	/* Object status. */
+	_Bool poisoned;
+
 	/* The current allocation size. */
 	size_t used;
 
@@ -72,6 +75,7 @@ static void _init_state(Buffer_State const S) {
 	S->libid = HurdLib_LIBID;
 	S->objid = HurdLib_Buffer_OBJID;
 
+	S->poisoned = false;
 	S->used = 0;
 	S->bf   = NULL;
 
@@ -98,8 +102,10 @@ static _Bool _do_alloc(const Buffer_State const S)
 {
 
 	S->bf = realloc(S->bf, S->seqn->get(S->seqn));
-	if (S->bf == NULL )
+	if (S->bf == NULL ) {
+		S->poisoned = true;
 		return false;
+	}
 
 	return true;
 }
@@ -135,6 +141,9 @@ static _Bool add(const Buffer const this, unsigned char const * const src, \
 
 	auto size_t free = S->seqn->get(S->seqn) - S->used;
 
+
+	if ( S->poisoned )
+		return false;
 
 	if ( cnt > free )
 		do {
@@ -203,7 +212,8 @@ static _Bool add_Buffer(const Buffer const this, const Buffer const bf)
 static _Bool add_hexstring(const Buffer const this, char const * const hexbufr)
 
 {
-	auto _Bool first_nybble = true;
+	auto _Bool retn = false,
+		   first_nybble = true;
 
 	auto unsigned char nybble,
 			   byte[1];
@@ -212,16 +222,21 @@ static _Bool add_hexstring(const Buffer const this, char const * const hexbufr)
 		    hexbufr_length;
 
 
+	/* Don't move forward if the object has had an error. */
+	if ( this->state->poisoned )
+		goto done;
+
 	/* Sanity check the string. */
-	if ( hexbufr == NULL )
-		return true;
+	if ( hexbufr == NULL ) {
+		this->state->poisoned = true;
+		goto done;
+	}
 
 	hexbufr_length = strlen(hexbufr);
-	if ( hexbufr_length == 0 )
-		return true;
-
-	if ( (hexbufr_length % 2) != 0 )
-		return false;
+	if ( (hexbufr_length == 0) || ((hexbufr_length % 2) != 0) ) {
+		this->state->poisoned = true;
+		goto done;
+	}
 
 
 	/*
@@ -281,7 +296,8 @@ static _Bool add_hexstring(const Buffer const this, char const * const hexbufr)
 				nybble = 15;
 				break;
 	    		default:
-				return false;
+				this->state->poisoned = true;
+				goto done;
 		}
 
 		if ( first_nybble ) {
@@ -294,9 +310,11 @@ static _Bool add_hexstring(const Buffer const this, char const * const hexbufr)
 			first_nybble = true;
 		}
 	}
+	retn = true;
 
 
-	return true;
+done:
+	return retn;
 }
 
 
@@ -319,6 +337,9 @@ static void shrink(const Buffer const this, size_t const cnt)
 {
 	auto Buffer_State S = this->state;
 
+
+	if ( S->poisoned )
+		return;
 
 	/* Safety check. */
 	/* HURTODO: Need to add warning if conditional succeeds. */
@@ -345,6 +366,8 @@ static void shrink(const Buffer const this, size_t const cnt)
 static size_t size(const Buffer const this)
 
 {
+	if ( this->state->poisoned )
+		return 0;
 	return this->state->used;
 }
 
@@ -365,6 +388,9 @@ static void reset(const Buffer const this)
 {
 	auto Buffer_State S = this->state;
 
+
+	if ( S->poisoned )
+		return;
 
 	memset(S->bf, '\0', S->used);
 	S->used = 0;
@@ -387,12 +413,12 @@ static void reset(const Buffer const this)
 static unsigned char *get(const Buffer const this)
 
 {
-	return(this->state->bf);
+	if ( this->state->poisoned )
+		return NULL;
+	return this->state->bf;
 }
 
 
-
-	
 /**
  * External public method.
  *
@@ -409,6 +435,12 @@ static void print(const Buffer const this)
 	auto size_t lp = 0;
 
 	auto Buffer_State S = this->state;
+
+
+	if ( this->state->poisoned ) {
+		fputs("* POISONED *\n", stderr);
+		return;
+	}
 
 	while ( lp < S->used ) {
 		fprintf(stdout, "%02x", *(S->bf+lp));
@@ -447,15 +479,36 @@ static void dump(const Buffer const this, int offset)
 	root->iprint(root, offset, "\tbufr: %p\n", S->bf);
 	root->iprint(root, offset, "\tused: %u\n", S->used);
 	root->iprint(root, offset, "\tallocated: %u\n", S->seqn->get(S->seqn));
+	root->iprint(root, offset, "\tstatus: %s\n", S->poisoned ? \
+		     "POISONED" : "OK");
 
 	root->iprint(root, offset, "\tContents: ");
-	this->print(this);
+	if ( S->poisoned ) {
+		S->poisoned = false;
+		this->print(this);
+	}
+	else	
+		this->print(this);
 	root->iprint(root, offset, "\n");
   
 	offset += 1;
 	S->seqn->dump(S->seqn, offset);
 
 	return;
+}
+
+
+/**
+ * External public method.
+ *
+ * This function returns the status of the object.
+ *
+ * \param this	A point to the object whose status is being requested.
+ */
+static _Bool poisoned(const Buffer const this)
+
+{
+	return this->state->poisoned;
 }
 
 
@@ -530,6 +583,7 @@ extern Buffer HurdLib_Buffer_Init(void)
 	this->reset	    = reset;
 	this->print   	    = print;
 	this->dump    	    = dump;
+	this->poisoned	    = poisoned;
 	this->whack   	    = whack;
 
 	return this;
