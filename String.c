@@ -95,9 +95,9 @@ static _Bool add(const String const this, char const * const src)
 
 	S->buffer->shrink(S->buffer, 1);
 
-	if ( !S->buffer->add(S->buffer, src, strlen(src)) )
+	if ( !S->buffer->add(S->buffer, (unsigned char *) src, strlen(src)) )
 		return false;
-	if ( !S->buffer->add(S->buffer, "\0", 1) )
+	if ( !S->buffer->add(S->buffer, '\0', 1) )
 		return false;
 
 	return true;
@@ -120,7 +120,7 @@ static _Bool add(const String const this, char const * const src)
 static char * get(const String const this)
 
 {
-	return this->state->buffer->get(this->state->buffer);
+	return (char *) this->state->buffer->get(this->state->buffer);
 }
 
 
