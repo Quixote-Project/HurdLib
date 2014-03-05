@@ -31,5 +31,6 @@
 #define HurdLib_Buffer_OBJID		3
 #define HurdLib_String_OBJID		4
 #define HurdLib_Config_OBJID		5
+#define HurdLib_File_OBJID		6
 
 #endif

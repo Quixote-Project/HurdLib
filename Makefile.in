@@ -14,7 +14,8 @@ LDFLAGS = @LDFLAGS@
 # Variables local to this Makefile
 CFLAGS = @CFLAGS@ @CPPFLAGS@ -Wall
 
-CSRC =	Buffer.c Fibsequence.c Origin.c String.c Config.c basic-parser.c
+CSRC =	Buffer.c Fibsequence.c Origin.c String.c Config.c basic-parser.c \
+	File.c
 
 LIBNAME = HurdLib
 LIBRARY = lib${LIBNAME}.a
@@ -63,6 +64,7 @@ distclean: clean
 # Source dependencies.
 Buffer.o: ${LIBNAME}.h Origin.h Fibsequence.h
 Fibsequence.o: ${LIBNAME}.h Origin.h Fibsequence.h
+File.o: ${LIBNAME}.h Origin.h Buffer.h File.h
 Origin.c: ${LIBNAME}.h Origin.h
 String.c: ${LIBNAME}.h Origin.h Buffer.h String.h
 Config.c: ${LIBNAME}.h Origin.h Config.h
