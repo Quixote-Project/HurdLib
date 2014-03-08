@@ -280,7 +280,7 @@ static _Bool slurp(const HurdLib_File const this, const Buffer const bufr)
 	rounds   = statbuf.st_size / sizeof(inbufr);
 	residual = statbuf.st_size % sizeof(inbufr);
 	while ( rounds-- ) {
-		if ( read(S->fh, inbufr, residual) == -1 ) {
+		if ( read(S->fh, inbufr, sizeof(inbufr)) == -1 ) {
 			S->poisoned = true;
 			return false;
 		}
