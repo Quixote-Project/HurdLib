@@ -73,7 +73,7 @@ struct HurdLib_File_State
  *        is to be initialized.
  */
 
-static void _init_state(const HurdLib_File_State const S) {
+static void _init_state(const File_State const S) {
 
 	S->libid = HurdLib_LIBID;
 	S->objid = HurdLib_File_OBJID;
@@ -101,11 +101,10 @@ static void _init_state(const HurdLib_File_State const S) {
  *		condition.
  */
 
-static _Bool open_ro(const HurdLib_File const this,
-		     const char * const fname)
+static _Bool open_ro(const File const this, const char * const fname)
 
 {
-	const HurdLib_File_State const S = this->state;
+	const File_State const S = this->state;
 
 
 	S->fh = open(fname, O_RDONLY);
@@ -134,11 +133,10 @@ static _Bool open_ro(const HurdLib_File const this,
  *		condition.
  */
 
-static _Bool open_rw(const HurdLib_File const this,
-		     const char * const fname)
+static _Bool open_rw(const File const this, const char * const fname)
 
 {
-	const HurdLib_File_State const S = this->state;
+	const File_State const S = this->state;
 
 	struct stat statbuf;
 
@@ -184,11 +182,11 @@ static _Bool open_rw(const HurdLib_File const this,
  *		the read was successful.
  */
 
-static _Bool read_buffer(const HurdLib_File const this, \
-			 const Buffer const bufr, size_t cnt)
+static _Bool read_buffer(const File const this, const Buffer const bufr, \
+			 size_t cnt)
 
 {
-	const HurdLib_File_State const S = this->state;
+	const File_State const S = this->state;
 
 	unsigned char inbufr;
 
@@ -247,10 +245,10 @@ static _Bool read_buffer(const HurdLib_File const this, \
  *		the read was successful.
  */
 
-static _Bool slurp(const HurdLib_File const this, const Buffer const bufr)
+static _Bool slurp(const File const this, const Buffer const bufr)
 
 {
-	const HurdLib_File_State const S = this->state;
+	const File_State const S = this->state;
 
 	unsigned char inbufr[16];
 
@@ -318,11 +316,10 @@ static _Bool slurp(const HurdLib_File const this, const Buffer const bufr)
  *		was experienced.
  */
 
-static _Bool write_buffer(const HurdLib_File const this,
-			  const Buffer const buffer)
+static _Bool write_buffer(const File const this, const Buffer const buffer)
 
 {
-	const HurdLib_File_State const S = this->state;
+	const File_State const S = this->state;
 
 	ssize_t size = buffer->size(buffer);
 
@@ -361,10 +358,10 @@ static _Bool write_buffer(const HurdLib_File const this,
  *		is returned.
  */
 
-static off_t seek(const HurdLib_File const this, off_t locn)
+static off_t seek(const File const this, off_t locn)
 
 {
-	const HurdLib_File_State const S = this->state;
+	const File_State const S = this->state;
 
 	int whence = SEEK_SET;
 
@@ -398,10 +395,10 @@ static off_t seek(const HurdLib_File const this, off_t locn)
  * \param this	A pointer to the object which is to be destroyed.
  */
 
-static void reset(const HurdLib_File const this)
+static void reset(const File const this)
 
 {
-	const HurdLib_File_State const S = this->state;
+	const File_State const S = this->state;
 
 
 	if ( S->fh != -1 )
@@ -419,7 +416,7 @@ static void reset(const HurdLib_File const this)
  *
  * \param this	The object whose status is being requested.
  */
-static _Bool poisoned(const HurdLib_File const this)
+static _Bool poisoned(const File const this)
 
 {
 	return this->state->poisoned;
@@ -434,10 +431,10 @@ static _Bool poisoned(const HurdLib_File const this)
  * \param this	A pointer to the object which is to be destroyed.
  */
 
-static void whack(const HurdLib_File const this)
+static void whack(const File const this)
 
 {
-	const HurdLib_File_State const S = this->state;
+	const File_State const S = this->state;
 
 
 	if ( S->fh != -1 )
@@ -457,12 +454,12 @@ static void whack(const HurdLib_File const this)
  *		indicates an error was encountered in object generation.
  */
 
-extern HurdLib_File HurdLib_File_Init(void)
+extern File HurdLib_File_Init(void)
 
 {
 	Origin root;
 
-	HurdLib_File this = NULL;
+	File this = NULL;
 
 	struct HurdLib_Origin_Retn retn;
 

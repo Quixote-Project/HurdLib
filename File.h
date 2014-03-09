@@ -15,9 +15,9 @@
 
 
 /* Object type definitions. */
-typedef struct HurdLib_File * HurdLib_File;
+typedef struct HurdLib_File * File;
 
-typedef struct HurdLib_File_State * HurdLib_File_State;
+typedef struct HurdLib_File_State * File_State;
 
 /**
  * External HurdLib_File object representation.
@@ -25,25 +25,25 @@ typedef struct HurdLib_File_State * HurdLib_File_State;
 struct HurdLib_File
 {
 	/* External methods. */
-	_Bool (*open_ro)(const HurdLib_File, const char *);
-	_Bool (*open_rw)(const HurdLib_File, const char *);
+	_Bool (*open_ro)(const File, const char *);
+	_Bool (*open_rw)(const File, const char *);
 
-	_Bool (*read_buffer)(const HurdLib_File, const Buffer, size_t);
-	_Bool (*slurp)(const HurdLib_File, const Buffer);
-	_Bool (*write_buffer)(const HurdLib_File, const Buffer);
+	_Bool (*read_buffer)(const File, const Buffer, size_t);
+	_Bool (*slurp)(const File, const Buffer);
+	_Bool (*write_buffer)(const File, const Buffer);
 
-	off_t (*seek)(const HurdLib_File, off_t);
+	off_t (*seek)(const File, off_t);
 
-	void (*reset)(const HurdLib_File);
-	_Bool (*poisoned)(const HurdLib_File);
-	void (*whack)(const HurdLib_File);
+	void (*reset)(const File);
+	_Bool (*poisoned)(const File);
+	void (*whack)(const File);
 
 	/* Private state. */
-	HurdLib_File_State state;
+	File_State state;
 };
 
 
 /* HurdLib_File constructor call. */
-extern HurdLib_File HurdLib_File_Init(void);
+extern File HurdLib_File_Init(void);
 
 #endif
