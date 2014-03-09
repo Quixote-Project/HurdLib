@@ -401,8 +401,10 @@ static void reset(const File const this)
 	const File_State const S = this->state;
 
 
-	if ( S->fh != -1 )
+	if ( S->fh != -1 ) {
 		close(S->fh);
+		S->fh = -1;
+	}
 	S->poisoned = false;
 
 	return;
