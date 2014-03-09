@@ -109,7 +109,7 @@ static _Bool open_ro(const File const this, const char * const fname)
 
 	S->fh = open(fname, O_RDONLY);
 	if ( S->fh == -1 ) {
-		S->error = errno;
+		S->error    = errno;
 		S->poisoned = true;
 		return false;
 	}
@@ -143,15 +143,15 @@ static _Bool open_rw(const File const this, const char * const fname)
 
 	if ( stat(fname, &statbuf) < 0 && (errno == ENOENT) ) {
 		if ( creat(fname, S_IRUSR | S_IWUSR | S_IRGRP) < 0 ) {
+			S->error    = errno;
 			S->poisoned = true;
-			S->error = errno;
 			return false;
 		}
 	}
 
 	S->fh = open(fname, O_RDWR);
 	if ( S->fh == -1 ) {
-		S->error = errno;
+		S->error    = errno;
 		S->poisoned = true;
 		return false;
 	}
@@ -196,7 +196,7 @@ static _Bool read_buffer(const File const this, const Buffer const bufr, \
 	if ( S->poisoned || (S->fh == -1) )
 		return false;
 	if ( bufr->poisoned(bufr) ) {
-		S->poisoned = false;
+		S->poisoned = true;
 		return false;
 	}
 
@@ -205,6 +205,7 @@ static _Bool read_buffer(const File const this, const Buffer const bufr, \
 		do {
 			retn = read(S->fh, &inbufr, 1);
 			if ( retn == -1 ) {
+				S->error    = errno;
 				S->poisoned = true;
 				return false;
 			}
@@ -212,22 +213,27 @@ static _Bool read_buffer(const File const this, const Buffer const bufr, \
 				bufr->add(bufr, &inbufr, 1);
 		}
 		while ( retn != 0 );
-
-		if ( bufr->poisoned(bufr) )
-		     return false;
+ 
+		if ( bufr->poisoned(bufr) ) {
+			S->poisoned = true;
+			return false;
+		}
 		return true;
 	}
 
 	while ( cnt-- ) {
 		if ( read(S->fh, &inbufr, 1) != 1 ) {
+			S->error    = errno;
 			S->poisoned = true;
 			return false;
 		}
 		bufr->add(bufr, &inbufr, 1);
 	}
 
-	if ( bufr->poisoned(bufr) )
+	if ( bufr->poisoned(bufr) ) {
+		S->poisoned = true;
 		return false;
+	}
 	return true;
 }
 
@@ -261,7 +267,7 @@ static _Bool slurp(const File const this, const Buffer const bufr)
 	if ( S->poisoned || (S->fh == -1) )
 		return false;
 	if ( bufr->poisoned(bufr) ) {
-		S->poisoned = false;
+		S->poisoned = true;
 		return false;
 	}
 
@@ -271,6 +277,7 @@ static _Bool slurp(const File const this, const Buffer const bufr)
 	}
 
 	if ( fstat(S->fh, &statbuf) == -1 ) {
+		S->error    = errno;
 		S->poisoned = true;
 		return false;
 	}
@@ -279,6 +286,7 @@ static _Bool slurp(const File const this, const Buffer const bufr)
 	residual = statbuf.st_size % sizeof(inbufr);
 	while ( rounds-- ) {
 		if ( read(S->fh, inbufr, sizeof(inbufr)) == -1 ) {
+			S->error    = errno;
 			S->poisoned = true;
 			return false;
 		}
@@ -290,6 +298,7 @@ static _Bool slurp(const File const this, const Buffer const bufr)
 
 	if ( residual > 0 ) {
 		if ( read(S->fh, inbufr, residual) == -1 ) {
+			S->error    = errno;
 			S->poisoned = true;
 			return false;
 		}
@@ -327,13 +336,13 @@ static _Bool write_buffer(const File const this, const Buffer const buffer)
 	if ( S->poisoned || (S->fh == -1) )
 		return false;
 	if ( buffer->poisoned(buffer) ) {
-		S->poisoned = false;
+		S->poisoned = true;
 		return false;
 	}
 
 	if ( write(S->fh, buffer->get(buffer), size) != size ) {
+		S->error    = errno;
 		S->poisoned = true;
-		S->error = errno;
 		return false;
 	}
 
@@ -377,6 +386,7 @@ static off_t seek(const File const this, off_t locn)
 	}
 
 	if ( (posn = lseek(S->fh, locn, whence)) == -1 ) {
+		S->error    = errno;
 		S->poisoned = true;
 		return -1;
 	}
