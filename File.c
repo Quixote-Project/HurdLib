@@ -214,7 +214,7 @@ static _Bool open_wo(const File const this, const char * const fname)
  *		the read was successful.
  */
 
-static _Bool read_buffer(const File const this, const Buffer const bufr, \
+static _Bool read_Buffer(const File const this, const Buffer const bufr, \
 			 size_t cnt)
 
 {
@@ -357,7 +357,7 @@ static _Bool slurp(const File const this, const Buffer const bufr)
  *		was experienced.
  */
 
-static _Bool write_buffer(const File const this, const Buffer const buffer)
+static _Bool write_Buffer(const File const this, const Buffer const buffer)
 
 {
 	const File_State const S = this->state;
@@ -530,9 +530,9 @@ extern File HurdLib_File_Init(void)
 	this->open_rw	= open_rw;
 	this->open_wo	= open_wo;
 
-	this->read_buffer	= read_buffer;
+	this->read_Buffer	= read_Buffer;
 	this->slurp		= slurp;
-	this->write_buffer	= write_buffer;
+	this->write_Buffer	= write_Buffer;
 
 	this->seek	= seek;
 

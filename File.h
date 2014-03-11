@@ -29,9 +29,9 @@ struct HurdLib_File
 	_Bool (*open_rw)(const File, const char *);
 	_Bool (*open_wo)(const File, const char *);
 
-	_Bool (*read_buffer)(const File, const Buffer, size_t);
+	_Bool (*read_Buffer)(const File, const Buffer, size_t);
 	_Bool (*slurp)(const File, const Buffer);
-	_Bool (*write_buffer)(const File, const Buffer);
+	_Bool (*write_Buffer)(const File, const Buffer);
 
 	off_t (*seek)(const File, off_t);
 
