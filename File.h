@@ -27,6 +27,7 @@ struct HurdLib_File
 	/* External methods. */
 	_Bool (*open_ro)(const File, const char *);
 	_Bool (*open_rw)(const File, const char *);
+	_Bool (*open_wo)(const File, const char *);
 
 	_Bool (*read_buffer)(const File, const Buffer, size_t);
 	_Bool (*slurp)(const File, const Buffer);

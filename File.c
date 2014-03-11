@@ -163,6 +163,38 @@ static _Bool open_rw(const File const this, const char * const fname)
 /**
  * External public method.
  *
+ * This method implements opening a file in write-only mode.
+ *
+ * \param this	A pointer to the object representing the file
+ *		to be opened.
+ *
+ * \param fname	The pathname of the file to be opened.
+ *
+ * \return	A boolean value is returned to indicate the status of
+ *		the file open.  A boolean indicates an error
+ *		condition.
+ */
+
+static _Bool open_wo(const File const this, const char * const fname)
+
+{
+	const File_State const S = this->state;
+
+
+	S->fh = open(fname, O_WRONLY);
+	if ( S->fh == -1 ) {
+		S->error    = errno;
+		S->poisoned = true;
+		return false;
+	}
+
+	return true;
+}
+
+
+/**
+ * External public method.
+ *
  * This method implements reading the contents of a file from the
  * current file pointer.   The amount read is designated by the count
  * arguement.  If the count arguement is zero the file is read until an
@@ -496,6 +528,7 @@ extern File HurdLib_File_Init(void)
 	/* Method initialization. */
 	this->open_ro	= open_ro;
 	this->open_rw	= open_rw;
+	this->open_wo	= open_wo;
 
 	this->read_buffer	= read_buffer;
 	this->slurp		= slurp;
