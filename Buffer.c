@@ -525,7 +525,9 @@ static void whack(const Buffer const this)
 {
 	auto Buffer_State S = this->state;
 
+	memset(S->bf, '\0', S->seqn->get(S->seqn));
 	free(S->bf);
+
 	S->seqn->whack(S->seqn);
 	S->root->whack(S->root, this, S);
 
