@@ -97,7 +97,7 @@ static _Bool add(const String const this, char const * const src)
 
 	if ( !S->buffer->add(S->buffer, (unsigned char *) src, strlen(src)) )
 		return false;
-	if ( !S->buffer->add(S->buffer, '\0', 1) )
+	if ( !S->buffer->add(S->buffer, "\0", 1) )
 		return false;
 
 	return true;
