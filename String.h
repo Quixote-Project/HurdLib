@@ -33,6 +33,7 @@ struct HurdLib_String
 	char * (*get)(const String);
 	size_t (*size)(const String);
 	void (*print)(const String);
+	_Bool (*poisoned)(const String);
 	void (*whack)(const String);
 
 	/* Private state. */

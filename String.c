@@ -93,11 +93,14 @@ static _Bool add(const String const this, char const * const src)
 	auto String_State S = this->state;
 
 
+	if ( S->buffer->poisoned(S->buffer) )
+		return false;
+
 	S->buffer->shrink(S->buffer, 1);
 
 	if ( !S->buffer->add(S->buffer, (unsigned char *) src, strlen(src)) )
 		return false;
-	if ( !S->buffer->add(S->buffer, "\0", 1) )
+	if ( !S->buffer->add(S->buffer, (unsigned char *) "\0", 1) )
 		return false;
 
 	return true;
@@ -120,6 +123,9 @@ static _Bool add(const String const this, char const * const src)
 static char * get(const String const this)
 
 {
+	if ( this->state->buffer->poisoned(this->state->buffer) )
+		return NULL;
+
 	return (char *) this->state->buffer->get(this->state->buffer);
 }
 
@@ -144,6 +150,9 @@ static size_t size(const String const this)
 	auto size_t size = S->buffer->size(S->buffer);
 
 
+	if ( S->buffer->poisoned(S->buffer) )
+		return 0;
+
 	if ( size == 0 )
 		return 0;
 	else
@@ -166,11 +175,30 @@ static void print(const String const this)
 {
 	auto String_State S = this->state;
 
-	fprintf(stdout, "%s\n", S->buffer->get(S->buffer));
+
+	if ( S->buffer->poisoned(S->buffer) )
+		fputs("* Poisoned *\n", stdout);
+	else
+		fprintf(stdout, "%s\n", S->buffer->get(S->buffer));
 
 	return;
 }
 
+
+/**
+ * External public method.
+ *
+ * This method implements a destructor for a String object.
+ *
+ * \param this	A pointer to the object which is to be destroyed.
+ */
+
+static _Bool poisoned(const String const this)
+
+{
+	return this->state->buffer->poisoned(this->state->buffer);
+}
+	
 
 /**
  * External public method.
@@ -234,11 +262,13 @@ extern String HurdLib_String_Init(void)
 	_init_state(this->state);
 
 	/* Method initialization. */
-	this->add    = add;
-	this->get    = get;
-	this->size   = size;
-	this->print  = print;
-	this->whack  = whack;
+	this->add	= add;
+	this->get	= get;
+	this->size	= size;
+	this->print	= print;
+	this->poisoned	= poisoned;
+
+	this->whack	= whack;
 
 	return this;
 }
