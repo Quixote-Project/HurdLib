@@ -14,6 +14,20 @@
 #ifndef HurdLib_HEADER
 #define HurdLib_HEADER
 
+/*
+ * The following definitions are used to implement source size
+ * optimizations for various commonly used routines.
+ */
+
+/* Macro for defining a pointer to a constant object. */
+#define CO(obj, var) const obj const var
+
+/* Macro to extract state state information into the specified variable. */
+#define STATE(var) CO(NAAAIM_IPsec_State, var) = this->state
+
+/* Macro to implement safe object destruction. */
+#define WHACK(obj) if (obj != NULL) {obj->whack(obj); obj = NULL;}
+
 
 /* Library memory debugging. */
 #if defined(DMALLOC)
