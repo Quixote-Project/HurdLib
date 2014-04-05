@@ -25,6 +25,11 @@
 /* Macro to implement safe object destruction. */
 #define WHACK(obj) if (obj != NULL) {obj->whack(obj); obj = NULL;}
 
+/* No argument object initialization macros. */
+#define _CCALL(lib,obj,init) lib##_##obj##_##init
+#define INIT(lib, obj, var, action) \
+	if ( (var = _CCALL(lib,obj,Init)()) == NULL ) action
+
 
 /* Library memory debugging. */
 #if defined(DMALLOC)
