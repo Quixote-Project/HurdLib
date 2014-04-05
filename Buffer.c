@@ -73,7 +73,7 @@ struct HurdLib_Buffer_State
  *        is to be initialized.
  */
 
-static void _init_state(Buffer_State const S) {
+static void _init_state(CO(Buffer_State, S)) {
 
 	S->libid = HurdLib_LIBID;
 	S->objid = HurdLib_Buffer_OBJID;
@@ -100,7 +100,7 @@ static void _init_state(Buffer_State const S) {
  *		success.
  */
 
-static _Bool _do_alloc(const Buffer_State const S)
+static _Bool _do_alloc(CO(Buffer_State, S))
 
 {
 
@@ -136,13 +136,12 @@ static _Bool _do_alloc(const Buffer_State const S)
  *		true value indicates success.
  */
 
-static _Bool add(const Buffer const this, unsigned char const * const src, \
-		size_t const cnt)
+static _Bool add(CO(Buffer, this), CO(unsigned char *, src), size_t const cnt)
 
 {
-	auto Buffer_State S = this->state;
+	STATE(S);
 
-	auto size_t free = S->seqn->get(S->seqn) - S->used;
+	size_t free = S->seqn->get(S->seqn) - S->used;
 
 
 	if ( S->poisoned )
@@ -181,7 +180,7 @@ static _Bool add(const Buffer const this, unsigned char const * const src, \
  *		true value indicates success.
  */
 
-static _Bool add_Buffer(const Buffer const this, const Buffer const bf)
+static _Bool add_Buffer(CO(Buffer, this), CO(Buffer, bf))
 
 {
 	return add(this, bf->get(bf), bf->size(bf));
@@ -212,32 +211,34 @@ static _Bool add_Buffer(const Buffer const this, const Buffer const bf)
  *		true value indicates success.
  */
 
-static _Bool add_hexstring(const Buffer const this, char const * const hexbufr)
+static _Bool add_hexstring(CO(Buffer, this), CO(char *,hexbufr))
 
 {
-	auto _Bool retn = false,
-		   first_nybble = true;
+	STATE(S);
 
-	auto unsigned char nybble,
-			   byte[1];
+	_Bool retn	   = false,
+	      first_nybble = true;
 
-	auto size_t lp,
-		    hexbufr_length;
+	unsigned char nybble,
+		      byte[1];
+
+	size_t lp,
+	       hexbufr_length;
 
 
 	/* Don't move forward if the object has had an error. */
-	if ( this->state->poisoned )
+	if ( S->poisoned )
 		goto done;
 
 	/* Sanity check the string. */
 	if ( hexbufr == NULL ) {
-		this->state->poisoned = true;
+		S->poisoned = true;
 		goto done;
 	}
 
 	hexbufr_length = strlen(hexbufr);
 	if ( (hexbufr_length == 0) || ((hexbufr_length % 2) != 0) ) {
-		this->state->poisoned = true;
+		S->poisoned = true;
 		goto done;
 	}
 
@@ -378,10 +379,10 @@ static _Bool equal(CO(Buffer, this), CO(Buffer, bufr))
  * \param cnt	The amount by which the object is to be contracted.
  */
 
-static void shrink(const Buffer const this, size_t const cnt)
+static void shrink(CO(Buffer, this), size_t const cnt)
 
 {
-	auto Buffer_State S = this->state;
+	STATE(S);
 
 
 	if ( S->poisoned )
@@ -409,12 +410,15 @@ static void shrink(const Buffer const this, size_t const cnt)
  *		from the actual physical allocated size of the buffer.
  */
 
-static size_t size(const Buffer const this)
+static size_t size(CO(Buffer, this))
 
 {
-	if ( this->state->poisoned )
+	STATE(S);
+
+
+	if ( S->poisoned )
 		return 0;
-	return this->state->used;
+	return S->used;
 }
 
 
@@ -429,10 +433,10 @@ static size_t size(const Buffer const this)
  *
  */
 
-static void reset(const Buffer const this)
+static void reset(CO(Buffer, this))
 
 {
-	auto Buffer_State S = this->state;
+	STATE(S);
 
 
 	if ( S->poisoned )
@@ -456,12 +460,15 @@ static void reset(const Buffer const this)
  * \return	A pointer to the address of the internal memory buffer.
  */
 
-static unsigned char *get(const Buffer const this)
+static unsigned char *get(CO(Buffer, this))
 
 {
-	if ( this->state->poisoned )
+	STATE(S);
+
+
+	if ( S->poisoned )
 		return NULL;
-	return this->state->bf;
+	return S->bf;
 }
 
 
@@ -475,15 +482,15 @@ static unsigned char *get(const Buffer const this)
  * \param	A pointer to the buffer which is to be printed.
  */
 
-static void print(const Buffer const this)
+static void print(CO(Buffer,this))
 
 {
-	auto size_t lp = 0;
+	STATE(S);
 
-	auto Buffer_State S = this->state;
+	size_t lp = 0;
 
 
-	if ( this->state->poisoned ) {
+	if ( S->poisoned ) {
 		fputs("* POISONED *\n", stderr);
 		return;
 	}
@@ -510,12 +517,12 @@ static void print(const Buffer const this)
  * \param offset	Te offset to be added to the output.
  */
 
-static void dump(const Buffer const this, int offset)
+static void dump(CO(Buffer, this), int offset)
 
 {
-	auto Buffer_State S = this->state;
+	STATE(S);
 
-	auto Origin root = this->state->root;
+	Origin root = this->state->root;
 
 
 	if ( offset == 0 )
@@ -551,10 +558,12 @@ static void dump(const Buffer const this, int offset)
  *
  * \param this	A point to the object whose status is being requested.
  */
-static _Bool poisoned(const Buffer const this)
+static _Bool poisoned(CO(Buffer, this))
 
 {
-	return this->state->poisoned;
+	STATE(S);
+
+	return S->poisoned;
 }
 
 
@@ -566,10 +575,10 @@ static _Bool poisoned(const Buffer const this)
  * \param this	A pointer to the object which is to be destroyed.
  */
 
-static void whack(const Buffer const this)
+static void whack(CO(Buffer, this))
 
 {
-	auto Buffer_State S = this->state;
+	STATE(S);
 
 	if ( S->bf != NULL )
 		memset(S->bf, '\0', S->seqn->get(S->seqn));
@@ -593,11 +602,11 @@ static void whack(const Buffer const this)
 extern Buffer HurdLib_Buffer_Init(void)
 
 {
-	auto Origin root;
+	Origin root;
 
-	auto Buffer this = NULL;
+	Buffer this = NULL;
 
-	auto struct HurdLib_Origin_Retn retn;
+	struct HurdLib_Origin_Retn retn;
 
 
 	/* Get the root object. */
