@@ -23,6 +23,9 @@
 #include "Fibsequence.h"
 #include "Buffer.h"
 
+/* State initialization macro. */
+#define STATE(var) CO(Buffer_State, var) = this->state
+
 
 /* Verify library/object header file inclusions. */
 #if !defined(HurdLib_LIBID)
@@ -321,6 +324,49 @@ done:
 /**
  * External public method.
  *
+ * This method implements the comparison of the contents of one buffer
+ * to another.  In a depart from the standard memcmp function this
+ * comparison only returns true and false since this seems to be the
+ * most commonly requested action.
+ *
+ * \param this	A pointer to the buffer object which will be used for
+ *		the comparison.
+ *
+ * \param bufr	The buffer which the object buffer will be compared to.
+ *
+ * \return	A boolean value is used to indicate where or not the
+ *		buffers are equivalent.  A true value indicates they
+ *		match in size and content.  A false value indicates
+ *		they are different.
+ */
+
+static _Bool equal(CO(Buffer, this), CO(Buffer, bufr))
+
+{
+	STATE(S);
+
+
+	/* Status checks. */
+	if ( S->poisoned )
+		return false;
+	if ( bufr->poisoned(bufr) ) {
+		S->poisoned = true;
+		return false;
+	}
+
+	/* Do size and content comparisons. */
+	if ( S->used != bufr->size(bufr) )
+		return false;
+	if ( memcmp(S->bf, bufr->get(bufr), S->used) != 0 )
+		return false;
+
+	return true;
+}
+
+			
+/**
+ * External public method.
+ *
  * This method implements reducing the effective size of the internal
  * memory buffer. It does this by decrementing the used size count of
  * the buffer.  NOTE that it does not physically reallocate the size
@@ -579,6 +625,7 @@ extern Buffer HurdLib_Buffer_Init(void)
 	this->add     	    = add;
 	this->add_Buffer    = add_Buffer;
 	this->add_hexstring = add_hexstring;
+	this->equal	    = equal;
 
 	this->get     	    = get;
 	this->shrink  	    = shrink;

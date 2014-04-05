@@ -29,6 +29,7 @@ struct HurdLib_Buffer
 	_Bool (*add)(const Buffer, unsigned char const *, size_t);
 	_Bool (*add_Buffer)(const Buffer, const Buffer);
 	_Bool (*add_hexstring)(const Buffer, char const *);
+	_Bool (*equal)(const Buffer, const Buffer);
 
 	unsigned char * (*get)(const Buffer);
 	void (*shrink)(const Buffer, size_t);
