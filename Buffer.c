@@ -477,7 +477,8 @@ static unsigned char *get(CO(Buffer, this))
  *
  * This method implements printing of the conten ts of the buffer.  For
  * lack of a better definition of 'printing' for a binary buffer the
- * hexadecimal representation of the buffer is printed.
+ * hexadecimal representation of the buffer is printed out in the
+ * standard 16 byte hexdump format.
  *
  * \param	A pointer to the buffer which is to be printed.
  */
@@ -487,7 +488,15 @@ static void print(CO(Buffer,this))
 {
 	STATE(S);
 
-	size_t lp = 0;
+	char printable[17];
+
+	unsigned char *p;
+
+	size_t rounds,
+	       residual,
+	       total,
+	       lp,
+	       lp1;
 
 
 	if ( S->poisoned ) {
@@ -495,11 +504,49 @@ static void print(CO(Buffer,this))
 		return;
 	}
 
-	while ( lp < S->used ) {
-		fprintf(stdout, "%02x", *(S->bf+lp));
-		++lp;
+	rounds   = S->used / 16;
+	residual = S->used % 16;
+	total	 = 0;
+
+	p = S->bf;
+	memset(printable, '\0', sizeof(printable));
+
+	/* Print complete 16 byte segments. */
+	for (lp= 0; lp < rounds; ++lp) {
+		total += 16;
+		fprintf(stdout, "%08zd: ", total);
+		for (lp1= 0; lp1 < 16; ++lp1) {
+			fprintf(stdout, "%02x ", *p);
+			if ( isalnum(*p) )
+				printable[lp1] = *p;
+			else
+				printable[lp1] = '.';
+			++p;
+		}
+		fprintf(stdout, "%s\n", printable);
 	}
-	fputc('\n', stdout);
+
+	/* Print out the residual bytes if any. */
+	if ( residual != 0 ) {
+		for (lp= 0; lp < 16; ++lp)
+			printable[lp] = '.';
+		     
+		total += residual;
+		fprintf(stdout, "%08zd: ", total);
+
+		for (lp= 0; lp < residual; ++lp) {
+			fprintf(stdout, "%02x ", *p);
+			if ( isalnum(*p) )
+				printable[lp] = *p;
+			else
+				printable[lp] = '.';
+			++p;
+		}
+	
+		for (lp= 0; lp < 16*3 - (residual*2 + residual); ++lp)
+			fputc(' ', stdout);
+		fprintf(stdout, "%s\n", printable);
+	}
 
 	return;
 }
