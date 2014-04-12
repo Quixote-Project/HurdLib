@@ -475,15 +475,50 @@ static unsigned char *get(CO(Buffer, this))
 /**
  * External public method.
  *
- * This method implements printing of the conten ts of the buffer.  For
+ * This method implements printing of the contents of the buffer.  For
  * lack of a better definition of 'printing' for a binary buffer the
- * hexadecimal representation of the buffer is printed out in the
- * standard 16 byte hexdump format.
+ * hexadecimal representation of the buffer is printed.
  *
  * \param	A pointer to the buffer which is to be printed.
  */
 
 static void print(CO(Buffer,this))
+
+{
+	STATE(S);
+
+	size_t lp = 0;
+
+
+	if ( S->poisoned ) {
+		fputs("* POISONED *\n", stderr);
+		return;
+	}
+
+	while ( lp < S->used ) {
+		fprintf(stdout, "%02x", *(S->bf+lp));
+		++lp;
+	}
+	fputc('\n', stdout);
+
+	return;
+}
+
+
+/**
+ * External public method.
+ *
+ * This method implements printing of the contents of the buffer in
+ * standard 16 byte hexdump format.  This format consists of three
+ * columns.  The left column is the cumulative count of bytes 
+ * display through the row.  The middle column is a dump of 16
+ * bytes in hexadecimal format.  The third column is the ASCII
+ * representation (if any) of the bytes.
+ *
+ * \param	A pointer to the buffer which is to be printed.
+ */
+
+static void hprint(CO(Buffer,this))
 
 {
 	STATE(S);
@@ -688,6 +723,7 @@ extern Buffer HurdLib_Buffer_Init(void)
 	this->size    	    = size;
 	this->reset	    = reset;
 	this->print   	    = print;
+	this->hprint	    = hprint;
 	this->dump    	    = dump;
 	this->poisoned	    = poisoned;
 	this->whack   	    = whack;

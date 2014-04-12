@@ -36,6 +36,7 @@ struct HurdLib_Buffer
 	size_t (*size)(const Buffer);
 	void (*reset)(const Buffer);
 	void (*print)(const Buffer);
+	void (*hprint)(const Buffer);
 	void (*dump)(const Buffer, int);
 	_Bool (*poisoned)(const Buffer);
 	void (*whack)(const Buffer);
