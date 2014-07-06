@@ -27,6 +27,7 @@
 #include "HurdLib.h"
 #include "Origin.h"
 #include "Buffer.h"
+#include "String.h"
 #include "File.h"
 
 
@@ -38,6 +39,9 @@
 #if !defined(HurdLib_File_OBJID)
 #error Object identifier not defined.
 #endif
+
+/* State initialization macro. */
+#define STATE(var) CO(File_State, var) = this->state
 
 
 /** HurdLib_File private state information. */
@@ -347,6 +351,69 @@ static _Bool slurp(const File const this, const Buffer const bufr)
 /**
  * External public method.
  *
+ * This method implements reading a String object from a file.  The
+ * delimiter of a string object is up to and including a newline
+ * character.  The newline is replaced with a null character.
+ *
+ * \param this	A pointer to the object representing the file from which
+ *		the String is to be read.
+ *
+ * \param str	The String object which is to be populated.
+ *
+ * \return	A boolean value is used to indicate whether or not
+ *		the read was successful.
+ */
+
+static _Bool read_String(CO(File, this), CO(String, str))
+
+{
+	STATE(S);
+
+	char inbufr[2];
+
+	int retn = 0;
+
+
+	if ( S->poisoned || (S->fh == -1) )
+		return false;
+	if ( str->poisoned(str) ) {
+		S->poisoned = true;
+		return false;
+	}
+
+
+	inbufr[1] = '\0';
+	do {
+		retn = read(S->fh, &inbufr[0], 1);
+		switch ( retn ) {
+			case -1:
+				S->error    = errno;
+				S->poisoned = true;
+				goto done;
+			case 0:
+				goto done;
+		}
+		if ( inbufr[0] != '\n' )
+			str->add(str, inbufr);
+	}
+	while ( inbufr[0] != '\n' );
+ 
+
+ done:
+	if ( str->poisoned(str) ) {
+		S->poisoned = true;
+		return false;
+	}
+
+	if ( retn == 0 )
+		return false;
+	return true;
+}
+
+
+/**
+ * External public method.
+ *
  * This method implements writing the contents of a buffer to the
  * opened file.
  *
@@ -532,6 +599,7 @@ extern File HurdLib_File_Init(void)
 
 	this->read_Buffer	= read_Buffer;
 	this->slurp		= slurp;
+	this->read_String	= read_String;
 	this->write_Buffer	= write_Buffer;
 
 	this->seek	= seek;
