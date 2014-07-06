@@ -198,8 +198,25 @@ static _Bool poisoned(const String const this)
 {
 	return this->state->buffer->poisoned(this->state->buffer);
 }
-	
 
+
+/**
+ * External public method.
+ *
+ * This method implements resetting of the String object back to its
+ * zero length.  This is done by inheriting functionality from the
+ * underying Buffer object.
+ *
+ * \param this	A point to the object which is to be reset.
+ */
+
+static void reset(CO(String, this))
+
+{
+	return this->state->buffer->reset(this->state->buffer);
+}
+	
+	
 /**
  * External public method.
  *
@@ -268,6 +285,7 @@ extern String HurdLib_String_Init(void)
 	this->print	= print;
 	this->poisoned	= poisoned;
 
+	this->reset	= reset;
 	this->whack	= whack;
 
 	return this;
