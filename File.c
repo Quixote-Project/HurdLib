@@ -10,6 +10,10 @@
  * for licensing information.
  **************************************************************************/
 
+/* Local defines. */
+/* Size of I/O buffer. */
+#define FILE_BUFSIZE 4069
+
 /* Include files. */
 #include <stdint.h>
 #include <stdlib.h>
@@ -64,6 +68,9 @@ struct HurdLib_File_State
 
 	/* File handle. */
 	int fh;
+
+	/* File buffer. */
+	unsigned char bufr[FILE_BUFSIZE];
 };
 
 
@@ -85,6 +92,8 @@ static void _init_state(const File_State const S) {
 	S->poisoned = false;
 	S->error    = 0;
 	S->fh	    = -1;
+
+	memset(S->bufr, '\0', sizeof(FILE_BUFSIZE));
 
 	return;
 }
@@ -224,9 +233,12 @@ static _Bool read_Buffer(const File const this, const Buffer const bufr, \
 {
 	const File_State const S = this->state;
 
-	unsigned char inbufr;
+	_Bool retn = false;
 
-	int retn = 0;
+	int amt_read = 0;
+
+	unsigned int rounds,
+		     residual;
 
 
 	if ( S->poisoned || (S->fh == -1) )
@@ -237,40 +249,58 @@ static _Bool read_Buffer(const File const this, const Buffer const bufr, \
 	}
 
 
+	/* Read the entire contents of the file from the current position. */
 	if ( cnt == 0 ) {
 		do {
-			retn = read(S->fh, &inbufr, 1);
-			if ( retn == -1 ) {
-				S->error    = errno;
-				S->poisoned = true;
-				return false;
+			amt_read = read(S->fh, S->bufr, FILE_BUFSIZE);
+			if ( amt_read == -1 ) {
+				S->error = errno;
+				goto done;
 			}
-			if ( retn == 1 )
-				bufr->add(bufr, &inbufr, 1);
+			if ( amt_read != 0 )
+				bufr->add(bufr, S->bufr, amt_read);
 		}
-		while ( retn != 0 );
+		while ( amt_read != 0 );
  
-		if ( bufr->poisoned(bufr) ) {
-			S->poisoned = true;
-			return false;
-		}
-		return true;
+		if ( !bufr->poisoned(bufr) )
+			retn = true;
+		goto done;
 	}
 
-	while ( cnt-- ) {
-		if ( read(S->fh, &inbufr, 1) != 1 ) {
-			S->error    = errno;
-			S->poisoned = true;
-			return false;
+	
+	/* Read the specified number of bytes. */
+	rounds	 = cnt / FILE_BUFSIZE;
+	residual = cnt % FILE_BUFSIZE;
+	while ( rounds-- ) {
+		amt_read = read(S->fh, S->bufr, FILE_BUFSIZE);
+		if ( amt_read == -1 ) {
+			S->error = errno;
+			goto done;
 		}
-		bufr->add(bufr, &inbufr, 1);
+		if ( amt_read > 0 )
+			bufr->add(bufr, S->bufr, amt_read);
 	}
 
-	if ( bufr->poisoned(bufr) ) {
+	if ( residual > 0 ) {
+		amt_read = read(S->fh, S->bufr, residual);
+		if ( amt_read == -1 ) {
+			S->error = errno;
+			goto done;
+		}
+		if ( amt_read != 0 )
+			bufr->add(bufr, S->bufr, amt_read);
+
+		if ( !bufr->poisoned(bufr) )
+			retn = true;
+	}
+
+
+done:
+	memset(S->bufr, '\0', FILE_BUFSIZE);
+
+	if ( !retn )
 		S->poisoned = true;
-		return false;
-	}
-	return true;
+	return retn;
 }
 
 
@@ -292,59 +322,28 @@ static _Bool slurp(const File const this, const Buffer const bufr)
 {
 	const File_State const S = this->state;
 
-	unsigned char inbufr[16];
-
-	unsigned int rounds,
-		     residual;
+	_Bool retn = false;
 
 	struct stat statbuf;
 
 
 	if ( S->poisoned || (S->fh == -1) )
 		return false;
-	if ( bufr->poisoned(bufr) ) {
-		S->poisoned = true;
-		return false;
-	}
+	if ( bufr->poisoned(bufr) )
+		goto done;
 
 	if ( this->seek(this, 0) == -1 ) {
+		S->error = errno;
+		goto done;
+	}
+
+	retn = this->read_Buffer(this, bufr, 0);
+
+
+ done:
+	if ( !retn )
 		S->poisoned = true;
-		return false;
-	}
-
-	if ( fstat(S->fh, &statbuf) == -1 ) {
-		S->error    = errno;
-		S->poisoned = true;
-		return false;
-	}
-
-	rounds   = statbuf.st_size / sizeof(inbufr);
-	residual = statbuf.st_size % sizeof(inbufr);
-	while ( rounds-- ) {
-		if ( read(S->fh, inbufr, sizeof(inbufr)) == -1 ) {
-			S->error    = errno;
-			S->poisoned = true;
-			return false;
-		}
-		if ( !bufr->add(bufr, inbufr, sizeof(inbufr)) ) {
-			S->poisoned = true;
-			return false;
-		}
-	}
-
-	if ( residual > 0 ) {
-		if ( read(S->fh, inbufr, residual) == -1 ) {
-			S->error    = errno;
-			S->poisoned = true;
-			return false;
-		}
-		if ( !bufr->add(bufr, inbufr, residual) ) {
-			S->poisoned = true;
-			return false;
-		}
-	}
-
-	return true;
+	return retn;
 }
 
 
