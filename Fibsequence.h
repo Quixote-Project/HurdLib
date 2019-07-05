@@ -40,6 +40,6 @@ struct HurdLib_Fibsequence
 
 
 /* Fibsequence constructor call. */
-extern Fibsequence HurdLib_Fibsequence_Init(void);
+extern HCLINK Fibsequence HurdLib_Fibsequence_Init(void);
 
 #endif

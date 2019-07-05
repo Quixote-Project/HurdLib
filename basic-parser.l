@@ -12,6 +12,7 @@
 %{
 #include <stdbool.h>
 
+#include "HurdLib.h"
 #include "Config.h"
 %}
 

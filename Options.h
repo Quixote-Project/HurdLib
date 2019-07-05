@@ -34,4 +34,4 @@ struct HURD_Options
 
 
 /* External function definitions. */
-extern Options HURD_Options_Init(void);
+extern HCLINK Options HURD_Options_Init(void);

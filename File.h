@@ -46,6 +46,6 @@ struct HurdLib_File
 
 
 /* HurdLib_File constructor call. */
-extern File HurdLib_File_Init(void);
+extern HCLINK File HurdLib_File_Init(void);
 
 #endif

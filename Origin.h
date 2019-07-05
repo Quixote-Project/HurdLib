@@ -51,6 +51,6 @@ struct HurdLib_Origin
 
 
 /* Origin constructor call. */
-extern Origin HurdLib_Origin_Init(void);
+extern HCLINK Origin HurdLib_Origin_Init(void);
 
 #endif

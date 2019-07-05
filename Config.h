@@ -42,6 +42,6 @@ struct HurdLib_Config
 
 
 /* Config constructor call. */
-extern Config HurdLib_Config_Init(void);
+extern HCLINK Config HurdLib_Config_Init(void);
 
 #endif
