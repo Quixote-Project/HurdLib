@@ -12,7 +12,7 @@ LDFLAGS = @LDFLAGS@
 
 
 # Variables local to this Makefile
-CFLAGS = @CFLAGS@ @CPPFLAGS@ -Wall
+CFLAGS = @CFLAGS@ @CPPFLAGS@ -Wall -fpic
 
 CSRC =	Buffer.c Fibsequence.c Origin.c String.c Config.c basic-parser.c \
 	File.c
