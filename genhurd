@@ -1,11 +1,12 @@
 #! /bin/bash
 
-# **************************************************************************
-# (C)Copyright 2006, The Open Hurderos Foundation. All rights reserved.
+
+#
+# Copyright (c) 2020, Enjellic Systems Development, LLC. All rights reserved.
 #
 # This utility implements generating source templates for a Hurdlib
 # programing object.
-# **************************************************************************
+#
 
 
 #
@@ -52,7 +53,8 @@ cat - <<EOF_COPYRIGHT
  */
 
 /**************************************************************************
- * (C)Copyright $date, The Open Hurderos Foundation. All rights reserved.
+ * Copyright (c) $date, Enjellic Systems Development, LLC. All rights reserved.
+ *
  *
  * Please refer to the file named COPYING in the top of the source tree
  * for licensing information.

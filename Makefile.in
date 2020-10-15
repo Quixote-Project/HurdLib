@@ -1,7 +1,8 @@
 # @configure_input@
-# ***************************************************************************
-# (C)Copyright 2003-2009, The Open Hurderos Foundation. All rights reserved.
-# ***************************************************************************
+
+#
+# Copyright (c) 2020, Enjellic Systems Development, LLC. All rights reserved.
+#
 
 
 # Variable declarations provided by autoconf/configure.

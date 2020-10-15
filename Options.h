@@ -1,17 +1,6 @@
-/*****************************************************************************
- * $Source$
- *
- * $Author$
- *
- * $Revision$
- *
- * $State$
- *
- * $Date$
- *
- * (C)Copyright 2005, Open Hurderos Foundation.  All rights reserved.
- ****************************************************************************/
-
+/**************************************************************************
+ * Copyright (c) 2020, Enjellic Systems Development, LLC. All rights reserved.
+ **************************************************************************/
 
 /* Object identification. */
 #define HURD_OPTIONS_ID 0x00000100

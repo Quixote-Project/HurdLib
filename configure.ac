@@ -2,7 +2,7 @@
 # Process this file with autoconf to produce a configure script.
 
 AC_PREREQ([2.68])
-AC_INIT([HurdLib Support Library], [0.2], [g.w@hurderos.org])
+AC_INIT([HurdLib Support Library], [0.5], [g.w@hurderos.org])
 AC_CONFIG_SRCDIR([Config.h])
 AC_CONFIG_HEADERS([config.h])
 

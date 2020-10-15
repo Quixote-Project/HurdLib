@@ -5,10 +5,7 @@
  */
 
 /**************************************************************************
- * (C)Copyright 2006, The Open Hurderos Foundation. All rights reserved.
- *
- * Please refer to the file named COPYING in the top of the source tree
- * for licensing information.
+ * Copyright (c) 2020, Enjellic Systems Development, LLC. All rights reserved.
  **************************************************************************/
 
 #ifndef HurdLib_Fibsequence_HEADER

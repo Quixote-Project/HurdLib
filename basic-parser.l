@@ -1,5 +1,5 @@
 /**************************************************************************
- * (C)Copyright 2005, The Open Hurderos Foundation. All rights reserved.
+ * Copyright (c) 2020, Enjellic Systems Development, LLC. All rights reserved.
  *
  * This file contains the definition of a flex parser used to get
  # basic KerDAP configuration information.
