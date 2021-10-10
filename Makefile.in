@@ -16,7 +16,9 @@ LDFLAGS = @LDFLAGS@
 CFLAGS = @CFLAGS@ @CPPFLAGS@ -Wall -fpic
 
 CSRC =	Buffer.c Fibsequence.c Origin.c String.c Config.c basic-parser.c \
-	File.c
+	File.c Gaggle.c
+
+TESTS = Gaggle_test
 
 LIBNAME = HurdLib
 LIBRARY = lib${LIBNAME}.a
@@ -43,7 +45,11 @@ COBJS = ${CSRC:.c=.o}
 
 
 # Targets
-all: ${LIBRARY}
+.PHONY: all tests
+
+all: ${LIBRARY} tests
+
+tests: ${TESTS}
 
 ${LIBRARY}: ${COBJS}
 	ar r ${LIBRARY} $^;
@@ -52,11 +58,14 @@ ${LIBRARY}: ${COBJS}
 basic-parser.c: basic-parser.l
 	flex -o$@ $?;
 
+Gaggle_test: Gaggle_test.o ${LIBRARY}
+	${CC} ${LDFLAGS} -o $@ $^ -L . -l ${LIBNAME};
+
 tags:
 	etags *.{h,c};
 
 clean:
-	/bin/rm -f basic-parser.c ${COBJS} *~ TAGS ${LIBRARY};
+	/bin/rm -f basic-parser.c ${COBJS} *~ TAGS ${TESTS} ${LIBRARY};
 
 distclean: clean
 	/bin/rm -f config.log config.status Makefile autom4te.cache;
@@ -69,3 +78,6 @@ File.o: ${LIBNAME}.h Origin.h Buffer.h File.h
 Origin.c: ${LIBNAME}.h Origin.h
 String.c: ${LIBNAME}.h Origin.h Buffer.h String.h
 Config.c: ${LIBNAME}.h Origin.h Config.h
+Gaggle.o: ${LIBNAME}.h Origin.h Buffer.h Gaggle.h
+
+Gaggle_test.o: ${LIBNAME}.h Buffer.h Gaggle.h
