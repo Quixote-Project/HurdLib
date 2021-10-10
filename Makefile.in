@@ -71,7 +71,7 @@ clean:
 	/bin/rm -f basic-parser.c ${COBJS} *~ TAGS ${TESTS} ${LIBRARY};
 
 distclean: clean
-	/bin/rm -f config.log config.status Makefile autom4te.cache;
+	/bin/rm -fr config.log config.status Makefile autom4te.cache;
 
 
 # Source dependencies.
