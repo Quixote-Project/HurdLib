@@ -55,6 +55,9 @@ ${LIBRARY}: ${COBJS}
 	ar r ${LIBRARY} $^;
 	ranlib ${LIBRARY};
 
+basic-parser.o: basic-parser.c
+	${CC} ${CFLAGS} -Wno-unused-function -c $< -o $@;
+
 basic-parser.c: basic-parser.l
 	flex -o$@ $?;
 
