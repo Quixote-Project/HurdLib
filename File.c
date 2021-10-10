@@ -321,8 +321,6 @@ static _Bool slurp(const File const this, const Buffer const bufr)
 
 	_Bool retn = false;
 
-	struct stat statbuf;
-
 
 	if ( S->poisoned || (S->fh == -1) )
 		return false;
