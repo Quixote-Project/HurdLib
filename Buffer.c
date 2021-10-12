@@ -549,7 +549,7 @@ static void hprint(CO(Buffer,this))
 		fprintf(stdout, "%08zd: ", total);
 		for (lp1= 0; lp1 < 16; ++lp1) {
 			fprintf(stdout, "%02x ", *p);
-			if ( isalnum(*p) )
+			if ( isprint(*p) )
 				printable[lp1] = *p;
 			else
 				printable[lp1] = '.';
@@ -568,7 +568,7 @@ static void hprint(CO(Buffer,this))
 
 		for (lp= 0; lp < residual; ++lp) {
 			fprintf(stdout, "%02x ", *p);
-			if ( isalnum(*p) )
+			if ( isprint(*p) )
 				printable[lp] = *p;
 			else
 				printable[lp] = '.';
