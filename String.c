@@ -11,11 +11,15 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdbool.h>
+#include <stdarg.h>
 
 #include "HurdLib.h"
 #include "Origin.h"
 #include "Buffer.h"
 #include "String.h"
+
+/* State initialization macro. */
+#define STATE(var) CO(String_State, var) = this->state
 
 
 /* Verify library/object header file inclusions. */
@@ -40,6 +44,9 @@ struct HurdLib_String_State
 	/* Object identifier. */
 	uint32_t objid;
 
+	/* Object status. */
+	_Bool poisoned;
+
 	/* The Buffer object which implements the string. */
 	Buffer buffer;
 };
@@ -59,6 +66,9 @@ static void _init_state(const String_State const S) {
 
 	S->libid = HurdLib_LIBID;
 	S->objid = HurdLib_String_OBJID;
+
+	S->poisoned = false;
+
 
 	return;
 }
@@ -101,6 +111,94 @@ static _Bool add(const String const this, char const * const src)
 		return false;
 
 	return true;
+}
+
+
+/**
+ * External public method.
+ *
+ * This method implements adding characters to an object in the form
+ * of a sequence of characters generated with sprintf.
+ *
+ * This method computes the expected size of the string and dynamically
+ * sizes the object to accept the formatted string.
+ *
+ * \param this	A pointer to the object which characters are to be
+ *		added to.
+ *
+ * \param fmt	A pointer to a buffer containing a null terminated
+ *		sequence of characters defining the format of the
+ *		string to be generated.
+ *
+ * \param ...	Arguments needed to support the generation of the
+ *		string.
+ *
+ * \return	A boolean value is returned to indicate the status of
+ *		adding the formatted string.  A true value indicates
+ *		success while a false value indicated the addition
+ *		failed.
+ */
+
+static _Bool add_sprintf(CO(String, this), CO(char *, fmt), ...)
+
+{
+	STATE(S);
+
+	_Bool retn = false;
+
+	char *bp;
+
+	int rc;
+
+	unsigned int lp;
+
+	size_t add,
+	       nullposn,
+	       needed;
+
+	va_list ap;
+
+
+	/* Compute the expected size of the string */
+	va_start(ap, fmt);
+	rc = vsnprintf(NULL, 0, fmt, ap);
+	va_end(ap);
+
+	if ( rc < 0 )
+		goto done;
+	needed = rc + 1;
+	add    = needed;
+
+
+	/* Expand the Buffer object to hold the string. */
+	nullposn = S->buffer->size(S->buffer);
+	if ( S->buffer->size(S->buffer) > 0 ) {
+		--nullposn;
+		--add;
+	}
+
+	for (lp=0; lp < add; ++lp) {
+		if ( !S->buffer->add(S->buffer, (void *) "\0", 1) )
+			goto done;
+	}
+
+
+	/* Print the string to the Buffer memory. */
+	bp  = (char *) S->buffer->get(S->buffer);
+	bp += nullposn;
+
+	va_start(ap, fmt);
+	rc = vsnprintf(bp, needed, fmt, ap);
+	va_end(ap);
+
+	retn = true;
+
+
+ done:
+	if ( !retn )
+		S->poisoned = true;
+
+	return retn;
 }
 
 
@@ -276,9 +374,12 @@ extern String HurdLib_String_Init(void)
 	_init_state(this->state);
 
 	/* Method initialization. */
-	this->add	= add;
+	this->add	  = add;
+	this->add_sprintf = add_sprintf;
+
 	this->get	= get;
 	this->size	= size;
+
 	this->print	= print;
 	this->poisoned	= poisoned;
 

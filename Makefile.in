@@ -18,7 +18,7 @@ CFLAGS = @CFLAGS@ @CPPFLAGS@ -Wall -fpic
 CSRC =	Buffer.c Fibsequence.c Origin.c String.c Config.c basic-parser.c \
 	File.c Gaggle.c
 
-TESTS = Gaggle_test
+TESTS = Gaggle_test String_test
 
 LIBNAME = HurdLib
 LIBRARY = lib${LIBNAME}.a
@@ -64,6 +64,9 @@ basic-parser.c: basic-parser.l
 Gaggle_test: Gaggle_test.o ${LIBRARY}
 	${CC} ${LDFLAGS} -o $@ $^ -L . -l ${LIBNAME};
 
+String_test: String_test.o ${LIBRARY}
+	${CC} ${LDFLAGS} -o $@ $^ -L . -l ${LIBNAME};
+
 tags:
 	etags *.{h,c};
 
@@ -83,4 +86,5 @@ String.c: ${LIBNAME}.h Origin.h Buffer.h String.h
 Config.c: ${LIBNAME}.h Origin.h Config.h
 Gaggle.o: ${LIBNAME}.h Origin.h Buffer.h Gaggle.h
 
+Strings_test.o: ${LIBNAME}.h String.h
 Gaggle_test.o: ${LIBNAME}.h Buffer.h Gaggle.h
