@@ -47,7 +47,7 @@ COBJS = ${CSRC:.c=.o}
 # Targets
 .PHONY: all tests
 
-all: ${LIBRARY} tests
+all: ${LIBRARY}
 
 tests: ${TESTS}
 
