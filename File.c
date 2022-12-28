@@ -81,8 +81,9 @@ struct HurdLib_File_State
  *        is to be initialized.
  */
 
-static void _init_state(const File_State const S) {
+static void _init_state(CO(File_State, S))
 
+{
 	S->libid = HurdLib_LIBID;
 	S->objid = HurdLib_File_OBJID;
 
@@ -111,10 +112,10 @@ static void _init_state(const File_State const S) {
  *		condition.
  */
 
-static _Bool open_ro(const File const this, const char * const fname)
+static _Bool open_ro(CO(File, this), CO(char *, fname))
 
 {
-	const File_State const S = this->state;
+	const File_State S = this->state;
 
 
 	S->fh = open(fname, O_RDONLY);
@@ -143,10 +144,10 @@ static _Bool open_ro(const File const this, const char * const fname)
  *		condition.
  */
 
-static _Bool open_rw(const File const this, const char * const fname)
+static _Bool open_rw(CO(File, this), CO(char *, fname))
 
 {
-	const File_State const S = this->state;
+	const File_State S = this->state;
 
 	struct stat statbuf;
 
@@ -185,10 +186,10 @@ static _Bool open_rw(const File const this, const char * const fname)
  *		condition.
  */
 
-static _Bool open_wo(const File const this, const char * const fname)
+static _Bool open_wo(CO(File, this), CO(char *, fname))
 
 {
-	const File_State const S = this->state;
+	const File_State S = this->state;
 
 
 	S->fh = open(fname, O_WRONLY);
@@ -224,11 +225,10 @@ static _Bool open_wo(const File const this, const char * const fname)
  *		the read was successful.
  */
 
-static _Bool read_Buffer(const File const this, const Buffer const bufr, \
-			 size_t cnt)
+static _Bool read_Buffer(CO(File, this), CO(Buffer, bufr), size_t cnt)
 
 {
-	const File_State const S = this->state;
+	const File_State S = this->state;
 
 	_Bool retn = false;
 
@@ -314,10 +314,10 @@ done:
  *		the read was successful.
  */
 
-static _Bool slurp(const File const this, const Buffer const bufr)
+static _Bool slurp(CO(File, this), CO(Buffer, bufr))
 
 {
-	const File_State const S = this->state;
+	const File_State S = this->state;
 
 	_Bool retn = false;
 
@@ -418,10 +418,10 @@ static _Bool read_String(CO(File, this), CO(String, str))
  *		was experienced.
  */
 
-static _Bool write_Buffer(const File const this, const Buffer const buffer)
+static _Bool write_Buffer(CO(File, this), CO(Buffer, buffer))
 
 {
-	const File_State const S = this->state;
+	const File_State S = this->state;
 
 	ssize_t size = buffer->size(buffer);
 
@@ -460,10 +460,10 @@ static _Bool write_Buffer(const File const this, const Buffer const buffer)
  *		is returned.
  */
 
-static off_t seek(const File const this, off_t locn)
+static off_t seek(CO(File, this), off_t locn)
 
 {
-	const File_State const S = this->state;
+	const File_State S = this->state;
 
 	int whence = SEEK_SET;
 
@@ -498,10 +498,10 @@ static off_t seek(const File const this, off_t locn)
  * \param this	A pointer to the object which is to be destroyed.
  */
 
-static void reset(const File const this)
+static void reset(CO(File, this))
 
 {
-	const File_State const S = this->state;
+	const File_State S = this->state;
 
 
 	if ( S->fh != -1 ) {
@@ -521,7 +521,7 @@ static void reset(const File const this)
  *
  * \param this	The object whose status is being requested.
  */
-static _Bool poisoned(const File const this)
+static _Bool poisoned(CO(File, this))
 
 {
 	return this->state->poisoned;
@@ -536,10 +536,10 @@ static _Bool poisoned(const File const this)
  * \param this	A pointer to the object which is to be destroyed.
  */
 
-static void whack(const File const this)
+static void whack(CO(File, this))
 
 {
-	const File_State const S = this->state;
+	const File_State S = this->state;
 
 
 	if ( S->fh != -1 )
