@@ -62,7 +62,7 @@ struct HurdLib_String_State
  *		which is to be initialized.
  */
 
-static void _init_state(const String_State const S) {
+static void _init_state(CO(String_State, S)) {
 
 	S->libid = HurdLib_LIBID;
 	S->objid = HurdLib_String_OBJID;
@@ -94,7 +94,7 @@ static void _init_state(const String_State const S) {
  *		success.
  */
 
-static _Bool add(const String const this, char const * const src)
+static _Bool add(CO(String, this), CO(char *, src))
 
 {
 	auto String_State S = this->state;
@@ -215,7 +215,7 @@ static _Bool add_sprintf(CO(String, this), CO(char *, fmt), ...)
  *		object is returned to the caller.
  */
 
-static char * get(const String const this)
+static char * get(CO(String, this))
 
 {
 	if ( this->state->buffer->poisoned(this->state->buffer) )
@@ -237,7 +237,7 @@ static char * get(const String const this)
  * \return	The size of the String.
  */
 
-static size_t size(const String const this)
+static size_t size(CO(String, this))
 
 {
 	auto String_State S = this->state;
@@ -265,7 +265,7 @@ static size_t size(const String const this)
  * \param this	A pointer to the string object which is to be printed.
  */
 
-static void print(const String const this)
+static void print(CO(String, this))
 
 {
 	auto String_State S = this->state;
@@ -288,7 +288,7 @@ static void print(const String const this)
  * \param this	A pointer to the object which is to be destroyed.
  */
 
-static _Bool poisoned(const String const this)
+static _Bool poisoned(CO(String, this))
 
 {
 	return this->state->buffer->poisoned(this->state->buffer);
@@ -320,7 +320,7 @@ static void reset(CO(String, this))
  * \param this	A pointer to the object which is to be destroyed.
  */
 
-static void whack(const String const this)
+static void whack(CO(String, this))
 
 {
 	auto String_State S = this->state;

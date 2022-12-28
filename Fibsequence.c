@@ -61,7 +61,7 @@ struct HurdLib_Fibsequence_State
  *        is to be initialized.
  */
 
-static void _init_state(const Fibsequence_State const S) {
+static void _init_state(CO(Fibsequence_State, S)) {
 
 	S->libid = HurdLib_LIBID;
 	S->objid = HurdLib_Fibsequence_OBJID;
@@ -90,7 +90,7 @@ static void _init_state(const Fibsequence_State const S) {
  *		the Fibonacci sequence.
  */
 
-static unsigned int get(const Fibsequence const this)
+static unsigned int get(CO(Fibsequence, this))
 
 {
 	return this->state->previous + this->state->current;
@@ -110,7 +110,7 @@ static unsigned int get(const Fibsequence const this)
  *		sequence.
  */
 
-static unsigned int next(const Fibsequence const this)
+static unsigned int next(CO(Fibsequence, this))
 
 {
 	auto unsigned int retn;
@@ -143,8 +143,7 @@ static unsigned int next(const Fibsequence const this)
  *		the specified ceiling.
  */
 
-static unsigned int getAbove(const Fibsequence const this, \
-			     unsigned int const to)
+static unsigned int getAbove(CO(Fibsequence, this), unsigned int const to)
 
 {
 	auto unsigned int retn,
@@ -175,7 +174,7 @@ static unsigned int getAbove(const Fibsequence const this, \
  * \param this	A pointer to the sequence which is to be reset.
  */
 
-static void reset(const Fibsequence const this)
+static void reset(CO(Fibsequence, this))
 
 {
 	_init_state(this->state);
@@ -192,7 +191,7 @@ static void reset(const Fibsequence const this)
  * \param this	A pointer to the Options object being operated on.
  */
 
-static void print(const Fibsequence const this)
+static void print(CO(Fibsequence, this))
 
 {
 	printf("Fibonacci sequence element: %p\n", this);
@@ -214,7 +213,7 @@ static void print(const Fibsequence const this)
  * \param offset	The output display depth.
  */
 
-static void dump(const Fibsequence const this, int const offset)
+static void dump(CO(Fibsequence, this), int const offset)
 
 {
 	auto Fibsequence_State S = this->state;
@@ -235,7 +234,7 @@ static void dump(const Fibsequence const this, int const offset)
  * \param this	A pointer to the object which is to be destroyed.
  */
 
-static void whack(const Fibsequence const this)
+static void whack(CO(Fibsequence, this))
 
 {
 	auto Fibsequence_State S = this->state;

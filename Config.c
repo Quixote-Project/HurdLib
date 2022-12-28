@@ -117,7 +117,7 @@ static void _init_state(Config_State const S) {
  *		error.
  */
 
-static _Bool _allocate_section(const Config_State const S, char *name)
+static _Bool _allocate_section(CO(Config_State, S), char *name)
 
 {
 	auto struct section *sp,
@@ -218,7 +218,7 @@ static _Bool _allocate_elements(struct section *section)
  *		the parsing of the file was successful.
  */
 
-static _Bool parse(const Config const config, const char * const cfgfile)
+static _Bool parse(CO(Config, config), CO(char *, cfgfile))
 
 {
 	auto _Bool retn;
@@ -257,7 +257,7 @@ static _Bool parse(const Config const config, const char * const cfgfile)
  *
  */
 
-static _Bool add_variable(const Config const this, char *variable)
+static _Bool add_variable(CO(Config, this), char *variable)
 
 {
 	auto Config_State S = this->state;
@@ -309,7 +309,7 @@ static _Bool add_variable(const Config const this, char *variable)
  *		failure of the addition of the value.
  */
 
-static _Bool add_value(const Config const this, char * const value)
+static _Bool add_value(CO(Config, this), char * const value)
 
 {
 	auto Config_State S = this->state;
@@ -345,7 +345,7 @@ static _Bool add_value(const Config const this, char * const value)
  *			A true value indicates succes.
 v */
 
-static _Bool add_section(const Config const this, char *name)
+static _Bool add_section(CO(Config, this), char *name)
 
 {
 	auto Config_State S = this->state;
@@ -379,7 +379,7 @@ static _Bool add_section(const Config const this, char *name)
  *			section was found.
  */
 
-extern _Bool set_section(const Config const this, const char *name)
+extern _Bool set_section(CO(Config, this), const char *name)
 
 {
 	auto Config_State S = this->state;
@@ -432,7 +432,7 @@ extern _Bool set_section(const Config const this, const char *name)
  *		returned.
  **************************************************************************/
 
-static char * get(const Config const this, const char *varname)
+static char * get(CO(Config, this), const char *varname)
 
 {
 	auto Config_State S = this->state;
@@ -482,7 +482,7 @@ static char * get(const Config const this, const char *varname)
  *		returned.
  **************************************************************************/
 
-static char * get_ignore(const Config const this, const char *varname)
+static char * get_ignore(CO(Config, this), const char *varname)
 
 {
 	auto Config_State S = this->state;
@@ -521,7 +521,7 @@ static char * get_ignore(const Config const this, const char *varname)
  *			be printed.
  */
 
-static void dump(const Config const this)
+static void dump(CO(Config, this))
 
 {
 	auto Config_State S = this->state;
@@ -568,10 +568,11 @@ static void dump(const Config const this)
  * \param this	A pointer to the object which is to be destroyed.
  */
 
-static void whack(const Config const this)
+static void whack(CO(Config, this))
 
 {
-	auto const Config_State const S = this->state;
+
+	const Config_State S = this->state;
 
 	auto int lp,
 		 lp1;

@@ -107,7 +107,7 @@ static void _check_state(void)
  *		error condition.
  */
 
-static _Bool init(const Origin const this, int const libid, int const objid, \
+static _Bool init(CO(Origin, this), int const libid, int const objid, \
 		  struct HurdLib_Origin_Retn * const retn)
 
 {
@@ -189,8 +189,7 @@ static void iprint(const Origin this, int offset, char const * const fmt, ...)
  * \param state		A pointer to the internal object state.
  */
 
-static void whack(const Origin const this, void * const object, \
-		    void * const state)
+static void whack(CO(Origin, this), void * const object, void * const state)
 
 {
 	free(state);
