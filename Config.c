@@ -144,8 +144,7 @@ static _Bool _allocate_section(CO(Config_State, S), char *name)
 			return false;
 		}
 
-		memset(sp->name, '\0', strlen(name + 1));
-		strncpy(sp->name, name + 1, strlen(name + 1) - 1);
+		strcpy(sp->name, name);
 	}
 
 	sp->size     = 0;
