@@ -18,7 +18,7 @@ CFLAGS = @CFLAGS@ @CPPFLAGS@ -Wall -fpic
 CSRC =	Buffer.c Fibsequence.c Origin.c String.c Config.c basic-parser.c \
 	File.c Gaggle.c
 
-TESTS = Gaggle_test String_test Config_test
+TESTS = Gaggle_test String_test Config_test File_test
 
 LIBNAME = HurdLib
 LIBRARY = lib${LIBNAME}.a
@@ -70,11 +70,15 @@ String_test: String_test.o ${LIBRARY}
 Config_test: Config_test.o ${LIBRARY}
 	${CC} ${LDFLAGS} -o $@ $^ -L . -l ${LIBNAME} -l fl;
 
+File_test: File_test.o ${LIBRARY}
+	${CC} ${LDFLAGS} -o $@ $^ -L . -l ${LIBNAME};
+
 tags:
 	etags *.{h,c};
 
 clean:
-	/bin/rm -f basic-parser.c ${COBJS} *~ TAGS ${TESTS} ${LIBRARY};
+	/bin/rm -f basic-parser.c ${COBJS} *~ TAGS ${TESTS} ${LIBRARY} \
+		File_test.txt;
 
 distclean: clean
 	/bin/rm -fr config.log config.status Makefile autom4te.cache;
