@@ -272,11 +272,11 @@ static void whack(Options this)
 extern Options HURD_Options_Init(void)
 
 {
-	auto Origin root;
+	Origin root;
 
-	auto Options this = NULL;
+	Options this = NULL;
 
-	auto struct HurdLib_Origin_Retn retn;
+	struct HurdLib_Origin_Retn retn;
 
 
 	/* Get the root object. */

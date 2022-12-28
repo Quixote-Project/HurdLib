@@ -97,7 +97,7 @@ static void _init_state(CO(String_State, S)) {
 static _Bool add(CO(String, this), CO(char *, src))
 
 {
-	auto String_State S = this->state;
+	String_State S = this->state;
 
 
 	if ( S->buffer->poisoned(S->buffer) )
@@ -240,9 +240,9 @@ static char * get(CO(String, this))
 static size_t size(CO(String, this))
 
 {
-	auto String_State S = this->state;
+	String_State S = this->state;
 
-	auto size_t size = S->buffer->size(S->buffer);
+	size_t size = S->buffer->size(S->buffer);
 
 
 	if ( S->buffer->poisoned(S->buffer) )
@@ -268,7 +268,7 @@ static size_t size(CO(String, this))
 static void print(CO(String, this))
 
 {
-	auto String_State S = this->state;
+	String_State S = this->state;
 
 
 	if ( S->buffer->poisoned(S->buffer) )
@@ -323,7 +323,7 @@ static void reset(CO(String, this))
 static void whack(CO(String, this))
 
 {
-	auto String_State S = this->state;
+	String_State S = this->state;
 
 
 	S->buffer->whack(S->buffer);
@@ -345,11 +345,11 @@ static void whack(CO(String, this))
 extern String HurdLib_String_Init(void)
 
 {
-	auto Origin root;
+	Origin root;
 
-	auto String this = NULL;
+	String this = NULL;
 
-	auto struct HurdLib_Origin_Retn retn;
+	struct HurdLib_Origin_Retn retn;
 
 
 	/* Get the root object. */
@@ -408,7 +408,7 @@ extern String HurdLib_String_Init(void)
 extern String HurdLib_String_Init_cstr(char const * const cstr)
 
 {
-	auto String this;
+	String this;
 
 
 	if ( (this = HurdLib_String_Init()) == NULL )

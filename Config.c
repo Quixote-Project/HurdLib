@@ -120,10 +120,10 @@ static void _init_state(Config_State const S) {
 static _Bool _allocate_section(CO(Config_State, S), char *name)
 
 {
-	auto struct section *sp,
-		            **p;
+	struct section *sp,
+		       **p;
 
-	auto size_t amt = sizeof(struct section *) * S->size;
+	size_t amt = sizeof(struct section *) * S->size;
 
 
 	/* Allocate or re-allocate memory and check for errors. */
@@ -181,9 +181,9 @@ static _Bool _allocate_section(CO(Config_State, S), char *name)
 static _Bool _allocate_elements(struct section *section)
 
 {
-	auto struct cfg_value **p;
+	struct cfg_value **p;
 
-	auto size_t amt = sizeof(struct cfg_value *) * (section->size + 1);
+	size_t amt = sizeof(struct cfg_value *) * (section->size + 1);
 
 
 	/* Allocate or re-allocate memory and check for errors. */
@@ -220,7 +220,7 @@ static _Bool _allocate_elements(struct section *section)
 static _Bool parse(CO(Config, config), CO(char *, cfgfile))
 
 {
-	auto _Bool retn;
+	_Bool retn;
 
 
 	/* Open configuration file. */
@@ -259,11 +259,11 @@ static _Bool parse(CO(Config, config), CO(char *, cfgfile))
 static _Bool add_variable(CO(Config, this), char *variable)
 
 {
-	auto Config_State S = this->state;
+	Config_State S = this->state;
 
-	auto struct cfg_value *cfp;
+	struct cfg_value *cfp;
 
-	auto struct section *section = S->sections[S->current];
+	struct section *section = S->sections[S->current];
 
 
 	/* Allocate an variable element. */
@@ -311,11 +311,11 @@ static _Bool add_variable(CO(Config, this), char *variable)
 static _Bool add_value(CO(Config, this), char * const value)
 
 {
-	auto Config_State S = this->state;
+	Config_State S = this->state;
 
-	auto struct section *section = S->sections[S->current];
+	struct section *section = S->sections[S->current];
 
-	auto struct cfg_value *elptr = section->elements[section->current];
+	struct cfg_value *elptr = section->elements[section->current];
 
 
 	/* Add a value to the current variable. */
@@ -347,7 +347,7 @@ v */
 static _Bool add_section(CO(Config, this), char *name)
 
 {
-	auto Config_State S = this->state;
+	Config_State S = this->state;
 
 
 	++S->current;
@@ -381,11 +381,11 @@ static _Bool add_section(CO(Config, this), char *name)
 extern _Bool set_section(CO(Config, this), const char *name)
 
 {
-	auto Config_State S = this->state;
+	Config_State S = this->state;
 
-	auto unsigned int secnumber;
+	unsigned int secnumber;
 
-	auto struct section **sections = S->sections;
+	struct section **sections = S->sections;
 
 
 	/* Handle the special case of the default section. */
@@ -434,11 +434,11 @@ extern _Bool set_section(CO(Config, this), const char *name)
 static char * get(CO(Config, this), const char *varname)
 
 {
-	auto Config_State S = this->state;
+	Config_State S = this->state;
 
-	auto int lp;
+	int lp;
 
-	auto struct section *section = S->sections[S->current];
+	struct section *section = S->sections[S->current];
 
 
 	/* Sanity check. */
@@ -484,11 +484,11 @@ static char * get(CO(Config, this), const char *varname)
 static char * get_ignore(CO(Config, this), const char *varname)
 
 {
-	auto Config_State S = this->state;
+	Config_State S = this->state;
 
-	auto int lp;
+	int lp;
 
-	auto struct section *section = S->sections[S->current];
+	struct section *section = S->sections[S->current];
 
 
 	/* Sanity check. */
@@ -523,14 +523,14 @@ static char * get_ignore(CO(Config, this), const char *varname)
 static void dump(CO(Config, this))
 
 {
-	auto Config_State S = this->state;
+	Config_State S = this->state;
 
-	auto int lp,
-		 lp1;
+	int lp,
+	    lp1;
 
-	auto struct section *section = S->sections[S->current];
+	struct section *section = S->sections[S->current];
 
-	auto struct cfg_value *cfp;
+	struct cfg_value *cfp;
 
 
 	/*
@@ -573,12 +573,12 @@ static void whack(CO(Config, this))
 
 	const Config_State S = this->state;
 
-	auto int lp,
-		 lp1;
+	int lp,
+	    lp1;
 
-	auto struct section *section;
+	struct section *section;
 
-	auto struct cfg_value *cfp;
+	struct cfg_value *cfp;
 
 
 	/* Release the variables in each section and then the section array. */
@@ -616,11 +616,11 @@ static void whack(CO(Config, this))
 extern Config HurdLib_Config_Init(void)
 
 {
-	auto Origin root;
+	Origin root;
 
-	auto Config this = NULL;
+	Config this = NULL;
 
-	auto struct HurdLib_Origin_Retn retn;
+	struct HurdLib_Origin_Retn retn;
 
 
 	/* Get the root object. */

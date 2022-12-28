@@ -113,9 +113,9 @@ static unsigned int get(CO(Fibsequence, this))
 static unsigned int next(CO(Fibsequence, this))
 
 {
-	auto unsigned int retn;
+	unsigned int retn;
 
-	auto Fibsequence_State const S = this->state;
+	Fibsequence_State const S = this->state;
 
 
 	retn = S->previous + S->current;
@@ -146,8 +146,8 @@ static unsigned int next(CO(Fibsequence, this))
 static unsigned int getAbove(CO(Fibsequence, this), unsigned int const to)
 
 {
-	auto unsigned int retn,
-		          next;
+	unsigned int retn,
+		     next;
 
 
 	while ( 1 ) {
@@ -216,7 +216,7 @@ static void print(CO(Fibsequence, this))
 static void dump(CO(Fibsequence, this), int const offset)
 
 {
-	auto Fibsequence_State S = this->state;
+	Fibsequence_State S = this->state;
 
 	S->root->iprint(S->root, offset, __FILE__ " dump: %p\n", this);
 	S->root->iprint(S->root, offset, "\tCurrent:  %d\n", S->current);
@@ -237,7 +237,7 @@ static void dump(CO(Fibsequence, this), int const offset)
 static void whack(CO(Fibsequence, this))
 
 {
-	auto Fibsequence_State S = this->state;
+	Fibsequence_State S = this->state;
 
 	S->root->whack(S->root, this, S);
 	return;
@@ -255,11 +255,11 @@ static void whack(CO(Fibsequence, this))
 extern Fibsequence HurdLib_Fibsequence_Init(void)
 
 {
-	auto Origin root;
+	Origin root;
 
-	auto Fibsequence this = NULL;
+	Fibsequence this = NULL;
 
-	auto struct HurdLib_Origin_Retn retn;
+	struct HurdLib_Origin_Retn retn;
 
 
 	/* Get the root object. */

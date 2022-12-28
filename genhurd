@@ -218,7 +218,7 @@ static void _init_state(const {OBJECT}_State const S) {
 static void whack(const {OBJECT} const this)
 
 {
-	auto const {OBJECT}_State const S = this->state;
+	const {OBJECT}_State const S = this->state;
 
 
 	S->root->whack(S->root, this, S);
@@ -238,11 +238,11 @@ static void whack(const {OBJECT} const this)
 extern {OBJECT} {LIBRARY}_{OBJECT}_Init(void)
 
 {
-	auto Origin root;
+	Origin root;
 
-	auto {OBJECT} this = NULL;
+	{OBJECT} this = NULL;
 
-	auto struct HurdLib_Origin_Retn retn;
+	struct HurdLib_Origin_Retn retn;
 
 
 	/* Get the root object. */
