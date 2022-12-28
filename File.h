@@ -30,6 +30,7 @@ struct HurdLib_File
 	_Bool (*slurp)(const File, const Buffer);
 	_Bool (*read_String)(const File, const String);
 	_Bool (*write_Buffer)(const File, const Buffer);
+	_Bool (*write_String)(const File, const String);
 
 	off_t (*seek)(const File, off_t);
 

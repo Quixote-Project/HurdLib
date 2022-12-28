@@ -258,13 +258,13 @@ static _Bool read_Buffer(CO(File, this), CO(Buffer, bufr), size_t cnt)
 				bufr->add(bufr, S->bufr, amt_read);
 		}
 		while ( amt_read != 0 );
- 
+
 		if ( !bufr->poisoned(bufr) )
 			retn = true;
 		goto done;
 	}
 
-	
+
 	/* Read the specified number of bytes. */
 	rounds	 = cnt / FILE_BUFSIZE;
 	residual = cnt % FILE_BUFSIZE;
@@ -391,7 +391,7 @@ static _Bool read_String(CO(File, this), CO(String, str))
 			str->add(str, inbufr);
 	}
 	while ( inbufr[0] != '\n' );
- 
+
 
  done:
 	if ( str->poisoned(str) ) {
@@ -440,6 +440,45 @@ static _Bool write_Buffer(CO(File, this), CO(Buffer, buffer))
 	}
 
 	return true;
+}
+
+
+/**
+ * External public method.
+ *
+ * This method implements writing the contents of a String object to
+ * a file.
+ *
+ * \param this	A pointer to the object being written to.
+ *
+ * \param str	The object whose contents is to be written.
+ *
+ * \return	A boolean value is returned to indicate the status
+ *		of the write.  A false value indicates an error
+ *		was experienced.
+ */
+
+static _Bool write_String(CO(File, this), CO(String, str))
+
+{
+	_Bool retn = false;
+
+	Buffer bufr = NULL;
+
+
+	INIT(HurdLib, Buffer, bufr, goto done);
+	if ( !bufr->add(bufr, (void *) str->get(str), str->size(str)) )
+		goto done;
+
+	if ( !write_Buffer(this, bufr) )
+		goto done;
+	retn = true;
+
+
+ done:
+	WHACK(bufr);
+
+	return retn;
 }
 
 
@@ -527,7 +566,7 @@ static _Bool poisoned(CO(File, this))
 	return this->state->poisoned;
 }
 
-	
+
 /**
  * External public method.
  *
@@ -549,7 +588,7 @@ static void whack(CO(File, this))
 	return;
 }
 
-	
+
 /**
  * External constructor call.
  *
@@ -595,6 +634,7 @@ extern File HurdLib_File_Init(void)
 	this->slurp		= slurp;
 	this->read_String	= read_String;
 	this->write_Buffer	= write_Buffer;
+	this->write_String	= write_String;
 
 	this->seek	= seek;
 
