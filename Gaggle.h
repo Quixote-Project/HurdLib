@@ -16,13 +16,13 @@
 
 
 /* Macro for adding an object to a gaggle. */
-#define GADD(gaggle, ptr) gaggle->add(gaggle, (void *) &ptr)
+#define GADD(gaggle, ptr) gaggle->add(gaggle, (void *) ptr)
 
 /* Macro for converting an opaque object. */
-#define GPTR(var, type) *(typeof(type) *) var
+#define GPTR(var, type) (typeof(type)) var
 
 /* Macro for getting an object from a gaggle. */
-#define GGET(gaggle, type) *(typeof(type) *) gaggle->get(gaggle)
+#define GGET(gaggle, type) (typeof(type)) gaggle->get(gaggle)
 
 /* Macro for calling the destructor on each object in a gaggle. */
 #define GWHACK(gaggle, type) {			\
@@ -33,6 +33,7 @@
 		o = GGET(gaggle, type);		\
 		o->whack(o);			\
 	}					\
+	WHACK(gaggle);				\
 }
 
 

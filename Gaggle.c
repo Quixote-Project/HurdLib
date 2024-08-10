@@ -16,6 +16,7 @@
 #include <stdlib.h>
 #include <stdbool.h>
 #include <stdio.h>
+#include <string.h>
 
 #include "HurdLib.h"
 #include "Origin.h"
@@ -105,17 +106,23 @@ static _Bool add(CO(Gaggle, this), void *object)
 
 	_Bool retn = false;
 
+	unsigned char b[sizeof(void *)];
+
+	void **array;
+
 
 	/* Verify object status. */
 	if ( S->poisoned )
 		goto done;
 
 
-	/* Add the object. */
-	if ( !S->gaggle->add(S->gaggle, object, sizeof(object)) )
+	/* Add a slot for the object and place the object in the slot. */
+	memset(b, '\0', sizeof(b));
+	if ( !S->gaggle->add(S->gaggle, b, sizeof(b)) )
 		goto done;
-	++S->size;
 
+	array = (void **) S->gaggle->get(S->gaggle);
+	array[S->size++] = object;
 	retn = true;
 
 
@@ -142,7 +149,8 @@ static void * get(CO(Gaggle, this))
 {
 	STATE(S);
 
-	void *retn = NULL;
+	void **array,
+	     *retn = NULL;
 
 
 	/* Verify object status. */
@@ -158,10 +166,8 @@ static void * get(CO(Gaggle, this))
 		
 
 	/* Return object pointer at the current cursor position. */
-	retn  = S->gaggle->get(S->gaggle);
-	retn += (S->cursor * sizeof(retn));
-
-	++S->cursor;
+	array = (void **) S->gaggle->get(S->gaggle);
+	retn = array[S->cursor++];
 
 
  done:
