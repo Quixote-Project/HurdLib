@@ -16,9 +16,9 @@ LDFLAGS = @LDFLAGS@
 CFLAGS = @CFLAGS@ @CPPFLAGS@ -Wall -fpic
 
 CSRC =	Buffer.c Fibsequence.c Origin.c String.c Config.c basic-parser.c \
-	File.c Gaggle.c
+	File.c Gaggle.c Process.c
 
-TESTS = Gaggle_test String_test Config_test File_test
+TESTS = Process_test Gaggle_test String_test Config_test File_test
 
 LIBNAME = HurdLib
 LIBRARY = lib${LIBNAME}.a
@@ -71,6 +71,9 @@ Config_test: Config_test.o ${LIBRARY}
 	${CC} ${LDFLAGS} -o $@ $^ -L . -l ${LIBNAME} -l fl;
 
 File_test: File_test.o ${LIBRARY}
+	${CC} ${LDFLAGS} -o $@ $^ -L . -l ${LIBNAME};
+
+Process_test: Process_test.o ${LIBRARY}
 	${CC} ${LDFLAGS} -o $@ $^ -L . -l ${LIBNAME};
 
 tags:
