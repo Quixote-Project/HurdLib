@@ -556,6 +556,23 @@ static void reset(CO(File, this))
 /**
  * External public method.
  *
+ * This method implements the clearing the error status of a file object.
+ *
+ * \param this	A pointer to the object whose error status is to be
+ *		cleared.
+ */
+
+static void clear(CO(File, this))
+
+{
+	this->state->poisoned = false;
+	return;
+}
+
+
+/**
+ * External public method.
+ *
  * This method returns the status of the object.
  *
  * \param this	The object whose status is being requested.
@@ -639,6 +656,7 @@ extern File HurdLib_File_Init(void)
 	this->seek	= seek;
 
 	this->reset	= reset;
+	this->clear	= clear;
 	this->poisoned	= poisoned;
 	this->whack	= whack;
 
