@@ -461,24 +461,25 @@ static _Bool write_Buffer(CO(File, this), CO(Buffer, buffer))
 static _Bool write_String(CO(File, this), CO(String, str))
 
 {
-	_Bool retn = false;
+	const File_State S = this->state;
 
-	Buffer bufr = NULL;
-
-
-	INIT(HurdLib, Buffer, bufr, goto done);
-	if ( !bufr->add(bufr, (void *) str->get(str), str->size(str)) )
-		goto done;
-
-	if ( !write_Buffer(this, bufr) )
-		goto done;
-	retn = true;
+	ssize_t size = str->size(str);
 
 
- done:
-	WHACK(bufr);
+	if ( S->poisoned || (S->fh == -1) )
+		return false;
+	if ( str->poisoned(str) ) {
+		S->poisoned = true;
+		return false;
+	}
 
-	return retn;
+	if ( write(S->fh, str->get(str), size) != size ) {
+		S->error    = errno;
+		S->poisoned = true;
+		return false;
+	}
+
+	return true;
 }
 
 
