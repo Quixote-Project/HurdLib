@@ -34,6 +34,7 @@ struct HurdLib_File
 
 	off_t (*seek)(const File, off_t);
 
+	int (*error)(const File);
 	void (*reset)(const File);
 	void (*clear)(const File);
 	_Bool (*poisoned)(const File);
