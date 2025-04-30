@@ -33,6 +33,14 @@
 #define INIT(lib, obj, var, action) \
 	if ( (var = _CCALL(lib,obj,Init)()) == NULL ) action
 
+/* Macro to clear and initialize the status of an object. */
+#define OBJ_STATE(lib, obj) struct lib##_##obj##_##State
+
+#define INIT_STATE(S, lib, obj)					   \
+	memset(S + offsetof(OBJ_STATE(lib, obj), libid), '\0',	   \
+		sizeof(*S) - offsetof(OBJ_STATE(lib,obj), libid)); \
+	S->libid = lib##_##LIBID;				   \
+	S->objid = lib##_##obj##_##OBJID
 
 /* Library memory debugging. */
 #if defined(DMALLOC)
